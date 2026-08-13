@@ -58,3 +58,4 @@
 - [x] Publish the verified ODHYAY source code to a private GitHub repository in the user’s account.
 - [x] Inspect the private ODHYAY GitHub repository in Vercel and confirm that its Vite-only import configuration cannot preserve the current full-stack features unchanged.
 - [x] Retain built-in hosting as the compatible release path; a Vercel serverless migration is intentionally not started.
+- [x] Restore Google OAuth sign-in for the published `promptweb-mzwhxyal.manus.space` domain.
