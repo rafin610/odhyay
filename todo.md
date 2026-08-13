@@ -56,3 +56,13 @@
 - [x] Re-verify all key lazy-loaded public and administrator routes after the PDF and route-splitting changes.
 - [x] Re-verify live Google authentication continuity through sign-out and sign-in, including administrator access restoration.
 - [x] Publish the verified ODHYAY source code to a private GitHub repository in the user’s account.
+- [x] Inspect the private ODHYAY GitHub repository in Vercel and confirm that its Vite-only import configuration cannot preserve the current full-stack features unchanged.
+- [x] Retain built-in hosting as the compatible release path; a Vercel serverless migration is intentionally not started.
+- [x] Restore Google OAuth sign-in for the published `promptweb-mzwhxyal.manus.space` domain.
+- [x] Add secure administrator local image upload for book covers using managed storage.
+- [x] Replace manual cover URL entry in administrator create and edit forms with image upload controls.
+- [x] Validate persisted uploaded-cover display across public book cards and details.
+- [x] Verify a temporary administrator local cover-image upload, public cover rendering, and cleanup flow.
+- [ ] Re-run temporary cover-image QA with verifiable rendered-image evidence on the public library card and book-detail page.
+- [ ] Add direct public cover component regression tests for persisted managed cover paths.
+- [ ] Commit and push the current local cover-upload implementation and QA artifacts to the private GitHub repository.

@@ -4,6 +4,7 @@ import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerGoogleOAuthRoutes } from "../googleOAuth";
+import { registerCoverUploadRoute } from "../coverUpload";
 import { registerPdfUploadRoute } from "../pdfUpload";
 import { registerReaderPdfRoute } from "../pdfReader";
 import { registerOAuthRoutes } from "./oauth";
@@ -40,6 +41,7 @@ async function startServer() {
   registerStorageProxy(app);
   registerOAuthRoutes(app);
   registerGoogleOAuthRoutes(app);
+  registerCoverUploadRoute(app);
   registerPdfUploadRoute(app);
   registerReaderPdfRoute(app);
   // tRPC API
