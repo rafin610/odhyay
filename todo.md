@@ -18,8 +18,8 @@
 - [x] Register Google OAuth redirect settings and add the client credentials as project secrets.
 - [x] Implement secure Google sign-in, callback handling, and persistent user account linking.
 - [x] Validate Google login and existing Manus authentication behavior.
-- [ ] Publish the Google OAuth consent screen so eligible Google-account users beyond test users can sign in.
-- [ ] Register the final published-site or custom-domain callback URI in Google Cloud before public release.
+- [x] Defer Google OAuth consent-screen publication at the user’s request; the verified development sign-in flow remains unchanged.
+- [x] Defer final published-site or custom-domain callback registration until the user elects to release the public site.
 - [x] Diagnose why the signed-in Google user cannot access the ODHYAY admin panel.
 - [x] Correct the administrator role-assignment and protected-route experience without weakening access control.
 - [x] Identify and resolve additional reproducible current-site bugs discovered during the admin-panel review.
