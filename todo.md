@@ -55,3 +55,4 @@
 - [x] Validate all repaired public, reader, administrator, authentication, and performance flows.
 - [x] Re-verify all key lazy-loaded public and administrator routes after the PDF and route-splitting changes.
 - [x] Re-verify live Google authentication continuity through sign-out and sign-in, including administrator access restoration.
+- [x] Publish the verified ODHYAY source code to a private GitHub repository in the user’s account.
