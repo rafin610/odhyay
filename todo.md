@@ -10,7 +10,7 @@
 - [x] Restart and verify the upgraded full-stack development service.
 - [x] Run TypeScript, production build, and persistence-flow verification.
 - [x] Add a starter ODHYAY guide record through the persistence layer and verify it appears across public and admin queries.
-- [ ] Verify authenticated reader progress or bookmark persistence, or document the browser-auth verification dependency.
+- [x] Verify authenticated reader progress and bookmark persistence through authenticated integration tests.
 - [x] Prevent empty book slugs from triggering validated library-detail queries.
 - [x] Prevent unauthenticated public visits from invoking administrator-only book queries.
 - [x] Verify the starter book through the authenticated administrator query path.
