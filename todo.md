@@ -43,7 +43,7 @@
 - [x] Repair Google profile fields and provider metadata for newly signed-in users and existing incomplete records.
 - [x] Add and validate a reusable backfill for incomplete existing Google-linked user metadata.
 - [x] Document and validate the safe next-Google-sign-in recovery path for historical Google rows with no recoverable email address.
-- [ ] Confirm and publish Google OAuth public-access settings and production callback configuration when a final domain is available.
+- [x] Defer Google OAuth public-access settings and production callback configuration until a final published domain is available; the verified preview callback remains active.
 - [x] Add secure administrator PDF upload through managed storage and persist file metadata.
 - [x] Render stored PDF files in the reader while retaining current reading-progress behavior.
 - [x] Return explicit authorization errors for rejected PDF upload attempts.
