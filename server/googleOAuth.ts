@@ -14,7 +14,7 @@ const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
 
 type GoogleState = { nonce: string; redirectUri: string };
 type GoogleToken = { access_token?: string; error?: string; error_description?: string };
-type GoogleProfile = { sub?: string; email?: string; name?: string };
+export type GoogleProfile = { sub?: string; email?: string; name?: string };
 
 function requestHost(req: Request) {
   const forwarded = req.headers["x-forwarded-host"];
@@ -33,6 +33,19 @@ export function validatedGoogleOrigin(origin: string | undefined, expectedHost: 
   } catch {
     return null;
   }
+}
+
+function normalizedProfileText(value: string | undefined) {
+  const normalized = value?.trim();
+  return normalized || undefined;
+}
+
+export function googleIdentityFromProfile(profile: GoogleProfile) {
+  const subject = normalizedProfileText(profile.sub);
+  if (!subject) return null;
+  const email = normalizedProfileText(profile.email);
+  const name = normalizedProfileText(profile.name) ?? email ?? "Google reader";
+  return { openId: `google:${subject}`, name, email: email ?? null, loginMethod: "google" as const };
 }
 
 function encodeState(value: GoogleState) {
@@ -113,9 +126,10 @@ export function registerGoogleOAuthRoutes(app: Express) {
       const profile = await profileResponse.json() as GoogleProfile;
       if (!profileResponse.ok || !profile.sub) throw new Error("Google profile is missing a subject identifier");
 
-      const openId = `google:${profile.sub}`;
-      await db.upsertUser({ openId, name: profile.name ?? null, email: profile.email ?? null, loginMethod: "google", lastSignedIn: new Date() });
-      const sessionToken = await sdk.createSessionToken(openId, { name: profile.name ?? profile.email ?? "Google reader", expiresInMs: ONE_YEAR_MS });
+      const identity = googleIdentityFromProfile(profile);
+      if (!identity) throw new Error("Google profile is missing a subject identifier");
+      await db.upsertUser({ ...identity, lastSignedIn: new Date() });
+      const sessionToken = await sdk.createSessionToken(identity.openId, { name: identity.name, expiresInMs: ONE_YEAR_MS });
       res.cookie(COOKIE_NAME, sessionToken, { ...getSessionCookieOptions(req), maxAge: ONE_YEAR_MS });
       res.redirect(302, "/");
     } catch (error) {

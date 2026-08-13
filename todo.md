@@ -27,3 +27,31 @@
 - [x] Verify that the existing Manus-compatible session format remains valid alongside Google sessions.
 - [x] Add a secure administrator role-management procedure so an existing administrator can promote intended ODHYAY users without ad-hoc database changes.
 - [x] Re-verify public home, library, search, book-detail, and reader routes after the access-control fixes.
+- [x] Inspect the current slug helper, slug-collision handling, tests, and affected persisted records.
+- [x] Prepare a reviewable Unicode-safe Bengali slug and one-off database migration diff without applying it.
+- [x] Apply the approved Unicode-safe slug helper, migration script, and revised tests.
+- [x] Run the migration safely and validate updated Bengali slugs and collision behavior.
+- [x] Add regression coverage for Bengali slug collision suffixes in regular creation and legacy-slug repair migration paths.
+- [x] Add end-to-end database coverage proving legacy untitled Bengali slugs migrate safely through the repair script.
+- [x] Inspect existing book mutation, role protection, and admin-list UI behavior for edit/delete integration.
+- [x] Prepare a reviewable admin book edit/delete diff without applying it.
+- [x] Apply the approved database helpers, protected mutations, admin menu, and query invalidation behavior.
+- [x] Verify update and deletion flows, including dependent reader-data cleanup.
+- [x] Execute a temporary administrator UI create-edit-delete flow and confirm query invalidation refreshes public and admin views.
+- [x] Preserve administrator edit-form draft values across query refetches so typed changes are not reset before saving.
+- [x] Remove temporary UI/test categories and authors, and ensure future persistence tests clean up all auxiliary records.
+- [x] Repair Google profile fields and provider metadata for newly signed-in users and existing incomplete records.
+- [x] Add and validate a reusable backfill for incomplete existing Google-linked user metadata.
+- [x] Document and validate the safe next-Google-sign-in recovery path for historical Google rows with no recoverable email address.
+- [ ] Confirm and publish Google OAuth public-access settings and production callback configuration when a final domain is available.
+- [x] Add secure administrator PDF upload through managed storage and persist file metadata.
+- [x] Render stored PDF files in the reader while retaining current reading-progress behavior.
+- [x] Return explicit authorization errors for rejected PDF upload attempts.
+- [x] Verify a temporary administrator PDF upload persists managed metadata and renders in the reader without regressing progress or bookmarks.
+- [x] Add automated PDF-backed reader load/error-state coverage.
+- [x] Serve stored PDF bytes through a same-origin reader endpoint so the PDF worker can load managed files without redirect-CORS failures.
+- [x] Add direct PDF reader component tests for loading-to-rendered and user-facing unavailable-document states.
+- [x] Reduce initial JavaScript payload through route-level code splitting.
+- [x] Validate all repaired public, reader, administrator, authentication, and performance flows.
+- [x] Re-verify all key lazy-loaded public and administrator routes after the PDF and route-splitting changes.
+- [x] Re-verify live Google authentication continuity through sign-out and sign-in, including administrator access restoration.

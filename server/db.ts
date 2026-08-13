@@ -4,6 +4,8 @@ import { authors, bookmarks, books, categories, favorites, InsertUser, readingPr
 import { ENV } from "./_core/env";
 
 let connection: ReturnType<typeof drizzle> | null = null;
+const unsafeSlugCharacters = new RegExp("[^\\p{L}\\p{M}\\p{N}\\s-]", "gu");
+const slugWhitespace = new RegExp("\\s+", "gu");
 
 export async function getDb() {
   if (!connection && process.env.DATABASE_URL) connection = drizzle(process.env.DATABASE_URL);
@@ -17,17 +19,71 @@ async function requireDb() {
 }
 
 export function toSlug(value: string) {
-  return value.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || "untitled";
+  return value.toLocaleLowerCase().trim().replace(unsafeSlugCharacters, "").replace(slugWhitespace, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || "untitled";
 }
+
+export type BookInput = {
+  title: string;
+  authorName: string;
+  categoryName: string;
+  description: string;
+  pageCount?: number;
+  status: "draft" | "published";
+  coverUrl?: string;
+  pdfKey?: string | null;
+  pdfFilename?: string | null;
+  pdfMimeType?: string | null;
+  pdfSize?: number | null;
+};
 
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) throw new Error("User openId is required for upsert");
   const db = await getDb();
   if (!db) return;
-  await db.insert(users).values({ ...user, lastSignedIn: user.lastSignedIn ?? new Date(), role: user.role ?? (user.openId === ENV.ownerOpenId ? "admin" : "user") }).onDuplicateKeyUpdate({ set: { name: user.name ?? null, email: user.email ?? null, loginMethod: user.loginMethod ?? null, lastSignedIn: new Date() } });
+  const signedInAt = user.lastSignedIn ?? new Date();
+  const values: InsertUser = {
+    openId: user.openId,
+    lastSignedIn: signedInAt,
+    role: user.role ?? (user.openId === ENV.ownerOpenId ? "admin" : "user"),
+  };
+  const updates: Partial<InsertUser> = { lastSignedIn: signedInAt };
+
+  for (const field of ["name", "email", "loginMethod"] as const) {
+    if (user[field] === undefined) continue;
+    const value = typeof user[field] === "string" ? user[field].trim() || null : user[field];
+    values[field] = value;
+    updates[field] = value;
+  }
+
+  if (user.role !== undefined) updates.role = user.role;
+  await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updates });
 }
 
 export async function getUserByOpenId(openId: string) { const db = await getDb(); if (!db) return undefined; const rows = await db.select().from(users).where(eq(users.openId, openId)).limit(1); return rows[0]; }
+
+export async function repairIncompleteGoogleUsers() {
+  const db = await requireDb();
+  const googleUsers = await db.select().from(users).where(like(users.openId, "google:%"));
+  let repaired = 0;
+  let requiresEmailRecovery = 0;
+
+  for (const user of googleUsers) {
+    const normalizedName = user.name?.trim() || null;
+    const normalizedEmail = user.email?.trim() || null;
+    const updates: Partial<InsertUser> = {};
+
+    if (!normalizedName) updates.name = normalizedEmail ?? "Google reader";
+    if (user.loginMethod !== "google") updates.loginMethod = "google";
+
+    if (!normalizedEmail) requiresEmailRecovery += 1;
+
+    if (Object.keys(updates).length === 0) continue;
+    await db.update(users).set(updates).where(eq(users.id, user.id));
+    repaired += 1;
+  }
+
+  return { repaired, requiresEmailRecovery };
+}
 
 export async function listManagedUsers() {
   const db = await requireDb();
@@ -47,7 +103,7 @@ export async function listBooks(input: { query?: string; categorySlug?: string; 
   const conditions = input.includeDrafts ? [] : [eq(books.status, "published")];
   if (input.categorySlug) conditions.push(eq(categories.slug, input.categorySlug));
   if (input.query) { const needle = `%${input.query}%`; conditions.push(or(like(books.title, needle), like(authors.name, needle), like(categories.name, needle))!); }
-  return db.select({ id: books.id, title: books.title, slug: books.slug, description: books.description, coverUrl: books.coverUrl, pdfKey: books.pdfKey, pageCount: books.pageCount, status: books.status, createdAt: books.createdAt, updatedAt: books.updatedAt, authorName: authors.name, categoryName: categories.name, categorySlug: categories.slug }).from(books).innerJoin(authors, eq(books.authorId, authors.id)).leftJoin(categories, eq(books.categoryId, categories.id)).where(conditions.length ? and(...conditions) : undefined).orderBy(desc(books.updatedAt));
+  return db.select({ id: books.id, title: books.title, slug: books.slug, description: books.description, coverUrl: books.coverUrl, pdfKey: books.pdfKey, pdfFilename: books.pdfFilename, pdfMimeType: books.pdfMimeType, pdfSize: books.pdfSize, pageCount: books.pageCount, status: books.status, createdAt: books.createdAt, updatedAt: books.updatedAt, authorName: authors.name, categoryName: categories.name, categorySlug: categories.slug }).from(books).innerJoin(authors, eq(books.authorId, authors.id)).leftJoin(categories, eq(books.categoryId, categories.id)).where(conditions.length ? and(...conditions) : undefined).orderBy(desc(books.updatedAt));
 }
 
 export async function getBookBySlug(slug: string, includeDrafts = false) { const rows = await listBooks({ includeDrafts }); return rows.find((book) => book.slug === slug); }
@@ -55,10 +111,52 @@ export async function getBookBySlug(slug: string, includeDrafts = false) { const
 async function ensureAuthor(name: string) { const db = await requireDb(); const found = await db.select().from(authors).where(eq(authors.name, name)).limit(1); if (found[0]) return found[0].id; const result = await db.insert(authors).values({ name }); return Number(result[0].insertId); }
 async function ensureCategory(name: string) { const db = await requireDb(); const found = await db.select().from(categories).where(eq(categories.name, name)).limit(1); if (found[0]) return found[0].id; const base = toSlug(name); let slug = base; let suffix = 2; while ((await db.select().from(categories).where(eq(categories.slug, slug)).limit(1))[0]) slug = `${base}-${suffix++}`; const result = await db.insert(categories).values({ name, slug }); return Number(result[0].insertId); }
 
-export async function createBook(input: { title: string; authorName: string; categoryName: string; description: string; pageCount?: number; status: "draft" | "published"; coverUrl?: string; pdfKey?: string }) {
-  const db = await requireDb(); const authorId = await ensureAuthor(input.authorName.trim()); const categoryId = await ensureCategory(input.categoryName.trim()); const base = toSlug(input.title); let slug = base; let suffix = 2; while ((await db.select().from(books).where(eq(books.slug, slug)).limit(1))[0]) slug = `${base}-${suffix++}`;
-  const result = await db.insert(books).values({ title: input.title.trim(), slug, description: input.description.trim(), authorId, categoryId, pageCount: input.pageCount ?? 0, status: input.status, coverUrl: input.coverUrl ?? null, pdfKey: input.pdfKey ?? null });
+async function nextBookSlug(title: string, excludeBookId?: number) {
+  const db = await requireDb();
+  const base = toSlug(title);
+  let slug = base;
+  let suffix = 2;
+  while (true) {
+    const existing = await db.select({ id: books.id }).from(books).where(eq(books.slug, slug)).limit(1);
+    if (!existing[0] || existing[0].id === excludeBookId) return slug;
+    slug = `${base}-${suffix++}`;
+  }
+}
+
+export async function createBook(input: BookInput) {
+  const db = await requireDb(); const authorId = await ensureAuthor(input.authorName.trim()); const categoryId = await ensureCategory(input.categoryName.trim()); const slug = await nextBookSlug(input.title);
+  const result = await db.insert(books).values({ title: input.title.trim(), slug, description: input.description.trim(), authorId, categoryId, pageCount: input.pageCount ?? 0, status: input.status, coverUrl: input.coverUrl ?? null, pdfKey: input.pdfKey ?? null, pdfFilename: input.pdfFilename ?? null, pdfMimeType: input.pdfMimeType ?? null, pdfSize: input.pdfSize ?? null });
   return { id: Number(result[0].insertId), slug };
+}
+
+export async function updateBook(id: number, input: Partial<BookInput>) {
+  const db = await requireDb();
+  const current = await db.select().from(books).where(eq(books.id, id)).limit(1);
+  if (!current[0]) return undefined;
+  const updates: Partial<typeof books.$inferInsert> = {};
+  if (input.title !== undefined) {
+    const title = input.title.trim();
+    updates.title = title;
+    if (title !== current[0].title) updates.slug = await nextBookSlug(title, id);
+  }
+  if (input.authorName !== undefined) updates.authorId = await ensureAuthor(input.authorName.trim());
+  if (input.categoryName !== undefined) updates.categoryId = await ensureCategory(input.categoryName.trim());
+  if (input.description !== undefined) updates.description = input.description.trim();
+  if (input.pageCount !== undefined) updates.pageCount = input.pageCount;
+  if (input.status !== undefined) updates.status = input.status;
+  if (input.coverUrl !== undefined) updates.coverUrl = input.coverUrl;
+  if (input.pdfKey !== undefined) updates.pdfKey = input.pdfKey ?? null;
+  if (input.pdfFilename !== undefined) updates.pdfFilename = input.pdfFilename ?? null;
+  if (input.pdfMimeType !== undefined) updates.pdfMimeType = input.pdfMimeType ?? null;
+  if (input.pdfSize !== undefined) updates.pdfSize = input.pdfSize ?? null;
+  if (Object.keys(updates).length) await db.update(books).set(updates).where(eq(books.id, id));
+  return { id, slug: updates.slug ?? current[0].slug };
+}
+
+export async function deleteBook(id: number) {
+  const db = await requireDb();
+  const result = await db.delete(books).where(eq(books.id, id));
+  return Number(result[0].affectedRows) > 0;
 }
 
 export async function updateReadingProgress(userId: number, bookId: number, currentPage: number, progressPercentage: number) { const db = await requireDb(); await db.insert(readingProgress).values({ userId, bookId, currentPage, progressPercentage }).onDuplicateKeyUpdate({ set: { currentPage, progressPercentage, updatedAt: new Date() } }); }

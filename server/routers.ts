@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { addBookmark, createBook, getBookBySlug, listBooks, listCategories, listManagedUsers, setManagedUserRole, toggleFavorite, updateReadingProgress } from "./db";
+import { addBookmark, createBook, deleteBook, getBookBySlug, listBooks, listCategories, listManagedUsers, setManagedUserRole, toggleFavorite, updateBook, updateReadingProgress } from "./db";
 
 const bookInput = z.object({
   title: z.string().trim().min(1).max(400),
@@ -14,8 +14,12 @@ const bookInput = z.object({
   pageCount: z.number().int().min(0).max(20_000).optional(),
   status: z.enum(["draft", "published"]),
   coverUrl: z.string().url().optional(),
-  pdfKey: z.string().max(512).optional(),
+  pdfKey: z.string().regex(/^books\/.+\.pdf$/, "PDF uploads must use a managed library key.").max(512).nullable().optional(),
+  pdfFilename: z.string().trim().min(1).max(512).nullable().optional(),
+  pdfMimeType: z.literal("application/pdf").nullable().optional(),
+  pdfSize: z.number().int().positive().max(30 * 1024 * 1024).nullable().optional(),
 });
+const updateBookInput = bookInput.partial().extend({ id: z.number().int().positive() });
 
 export const appRouter = router({
   system: systemRouter,
@@ -45,6 +49,16 @@ export const appRouter = router({
   admin: router({
     listBooks: adminProcedure.query(() => listBooks({ includeDrafts: true })),
     createBook: adminProcedure.input(bookInput).mutation(async ({ input }) => createBook(input)),
+    updateBook: adminProcedure.input(updateBookInput).mutation(async ({ input }) => {
+      const { id, ...changes } = input;
+      const updated = await updateBook(id, changes);
+      if (!updated) throw new TRPCError({ code: "NOT_FOUND", message: "Book not found." });
+      return updated;
+    }),
+    deleteBook: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ input }) => {
+      if (!await deleteBook(input.id)) throw new TRPCError({ code: "NOT_FOUND", message: "Book not found." });
+      return { success: true } as const;
+    }),
     listUsers: adminProcedure.query(() => listManagedUsers()),
     setUserRole: adminProcedure.input(z.object({ openId: z.string().trim().min(1).max(128), role: z.enum(["admin", "user"]) })).mutation(async ({ ctx, input }) => {
       if (ctx.user.openId === input.openId && input.role !== "admin") throw new TRPCError({ code: "BAD_REQUEST", message: "You cannot remove your own administrator access." });

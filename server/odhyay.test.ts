@@ -7,7 +7,8 @@ describe("ODHYAY persistence helpers", () => {
     expect(toSlug("A   Small Atlas---of Stars")).toBe("a-small-atlas-of-stars");
   });
 
-  it("uses a safe fallback for non-Latin-only titles", () => {
-    expect(toSlug("বাংলা সাহিত্য")).toBe("untitled");
+  it("preserves Unicode letters and numbers in URL-safe slugs", () => {
+    expect(toSlug("বাংলা সাহিত্য")).toBe("বাংলা-সাহিত্য");
+    expect(toSlug("Bangla: বাংলা সাহিত্য ২০২৬!")).toBe("bangla-বাংলা-সাহিত্য-২০২৬");
   });
 });
