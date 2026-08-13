@@ -5,15 +5,17 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { AboutPage, AdminBooksPage, AdminDashboardPage, AdminNewBookPage, BookPage, CategoriesPage, HomePage, LibraryPage, ReaderPage, SearchPage } from "./pages/Odhyay";
-
+import { AboutPage } from "./pages/Odhyay";
+import { BookPersistentPage, CategoriesPersistentPage, HomePersistentPage, LibraryPersistentPage, ReaderPersistentPage, SearchPersistentPage } from "./pages/OdhyayPersistent";
+import { AdminPersistentBooksPage, AdminPersistentDashboardPage, AdminPersistentNewBookPage } from "./pages/OdhyayPersistentAdmin";
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return <Switch>
-    <Route path="/" component={HomePage} /><Route path="/library" component={LibraryPage} />
-    <Route path="/categories" component={CategoriesPage} /><Route path="/search" component={SearchPage} />
-    <Route path="/book/:slug" component={BookPage} /><Route path="/read/:slug" component={ReaderPage} />
-    <Route path="/about" component={AboutPage} /><Route path="/admin" component={AdminDashboardPage} />
-    <Route path="/admin/books" component={AdminBooksPage} /><Route path="/admin/books/new" component={AdminNewBookPage} />
+    <Route path="/" component={HomePersistentPage} /><Route path="/library" component={LibraryPersistentPage} />
+    <Route path="/categories" component={CategoriesPersistentPage} /><Route path="/search" component={SearchPersistentPage} />
+    <Route path="/book/:slug" component={BookPersistentPage} /><Route path="/read/:slug" component={ReaderPersistentPage} />
+    <Route path="/about" component={AboutPage} /><Route path="/admin" component={AdminPersistentDashboardPage} />
+    <Route path="/admin/books" component={AdminPersistentBooksPage} /><Route path="/admin/books/new" component={AdminPersistentNewBookPage} />
     <Route path="/404" component={NotFound} /><Route component={NotFound} />
   </Switch>;
 }
