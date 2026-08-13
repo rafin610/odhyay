@@ -1,5 +1,5 @@
 /* ODHYAY style: Quiet Editorial — persisted records enter the same calm, literary composition used for the public library. */
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useRoute } from "wouter";
 import { ArrowLeft, ArrowRight, Bookmark, ChevronRight, Expand, Filter, Heart, Minus, Plus, Search, Sparkles } from "lucide-react";
 import { toast } from "sonner";

@@ -1,7 +1,7 @@
 /* ODHYAY style: Quiet Editorial — shared chrome uses editorial labels, hairline rules, warm ivory type, and soft amethyst focus. */
 import { Link, useLocation } from "wouter";
 import { ArrowRight, CircleUserRound, Menu, Search, X } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { startGoogleLogin } from "@/const";
 import { assets, type Book } from "@/lib/odhyayData";
