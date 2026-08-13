@@ -29,6 +29,17 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 
 export async function getUserByOpenId(openId: string) { const db = await getDb(); if (!db) return undefined; const rows = await db.select().from(users).where(eq(users.openId, openId)).limit(1); return rows[0]; }
 
+export async function listManagedUsers() {
+  const db = await requireDb();
+  return db.select({ id: users.id, openId: users.openId, name: users.name, email: users.email, loginMethod: users.loginMethod, role: users.role, lastSignedIn: users.lastSignedIn }).from(users).orderBy(desc(users.lastSignedIn));
+}
+
+export async function setManagedUserRole(openId: string, role: "admin" | "user") {
+  const db = await requireDb();
+  const result = await db.update(users).set({ role }).where(eq(users.openId, openId));
+  return Number(result[0].affectedRows) > 0;
+}
+
 export async function listCategories() { const db = await requireDb(); return db.select().from(categories).orderBy(categories.name); }
 
 export async function listBooks(input: { query?: string; categorySlug?: string; includeDrafts?: boolean } = {}) {

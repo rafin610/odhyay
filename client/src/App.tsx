@@ -7,7 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AboutPage } from "./pages/Odhyay";
 import { BookPersistentPage, CategoriesPersistentPage, HomePersistentPage, LibraryPersistentPage, ReaderPersistentPage, SearchPersistentPage } from "./pages/OdhyayPersistent";
-import { AdminPersistentBooksPage, AdminPersistentDashboardPage, AdminPersistentNewBookPage } from "./pages/OdhyayPersistentAdmin";
+import { AdminPersistentAccessPage, AdminPersistentBooksPage, AdminPersistentDashboardPage, AdminPersistentNewBookPage } from "./pages/OdhyayPersistentAdmin";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return <Switch>
@@ -15,7 +15,7 @@ function Router() {
     <Route path="/categories" component={CategoriesPersistentPage} /><Route path="/search" component={SearchPersistentPage} />
     <Route path="/book/:slug" component={BookPersistentPage} /><Route path="/read/:slug" component={ReaderPersistentPage} />
     <Route path="/about" component={AboutPage} /><Route path="/admin" component={AdminPersistentDashboardPage} />
-    <Route path="/admin/books" component={AdminPersistentBooksPage} /><Route path="/admin/books/new" component={AdminPersistentNewBookPage} />
+    <Route path="/admin/books" component={AdminPersistentBooksPage} /><Route path="/admin/books/new" component={AdminPersistentNewBookPage} /><Route path="/admin/access" component={AdminPersistentAccessPage} />
     <Route path="/404" component={NotFound} /><Route component={NotFound} />
   </Switch>;
 }

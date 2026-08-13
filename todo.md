@@ -14,3 +14,16 @@
 - [x] Prevent empty book slugs from triggering validated library-detail queries.
 - [x] Prevent unauthenticated public visits from invoking administrator-only book queries.
 - [x] Verify the starter book through the authenticated administrator query path.
+- [x] Inspect the current browser and authentication integration configuration for Google OAuth readiness.
+- [x] Register Google OAuth redirect settings and add the client credentials as project secrets.
+- [x] Implement secure Google sign-in, callback handling, and persistent user account linking.
+- [x] Validate Google login and existing Manus authentication behavior.
+- [ ] Publish the Google OAuth consent screen so eligible Google-account users beyond test users can sign in.
+- [ ] Register the final published-site or custom-domain callback URI in Google Cloud before public release.
+- [x] Diagnose why the signed-in Google user cannot access the ODHYAY admin panel.
+- [x] Correct the administrator role-assignment and protected-route experience without weakening access control.
+- [x] Identify and resolve additional reproducible current-site bugs discovered during the admin-panel review.
+- [x] Verify administrator access and key public user flows after the fixes.
+- [x] Verify that the existing Manus-compatible session format remains valid alongside Google sessions.
+- [x] Add a secure administrator role-management procedure so an existing administrator can promote intended ODHYAY users without ad-hoc database changes.
+- [x] Re-verify public home, library, search, book-detail, and reader routes after the access-control fixes.

@@ -29,3 +29,10 @@ export const startLogin = () => {
 
   window.location.href = url.toString();
 };
+
+/** Start Google OAuth at the moment a visitor explicitly selects the provider. */
+export const startGoogleLogin = () => {
+  const url = new URL("/api/auth/google", window.location.origin);
+  url.searchParams.set("origin", window.location.origin);
+  window.location.href = url.toString();
+};

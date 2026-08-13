@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { COOKIE_NAME } from "@shared/const";
+import { TRPCError } from "@trpc/server";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { addBookmark, createBook, getBookBySlug, listBooks, listCategories, toggleFavorite, updateReadingProgress } from "./db";
+import { addBookmark, createBook, getBookBySlug, listBooks, listCategories, listManagedUsers, setManagedUserRole, toggleFavorite, updateReadingProgress } from "./db";
 
 const bookInput = z.object({
   title: z.string().trim().min(1).max(400),
@@ -44,6 +45,13 @@ export const appRouter = router({
   admin: router({
     listBooks: adminProcedure.query(() => listBooks({ includeDrafts: true })),
     createBook: adminProcedure.input(bookInput).mutation(async ({ input }) => createBook(input)),
+    listUsers: adminProcedure.query(() => listManagedUsers()),
+    setUserRole: adminProcedure.input(z.object({ openId: z.string().trim().min(1).max(128), role: z.enum(["admin", "user"]) })).mutation(async ({ ctx, input }) => {
+      if (ctx.user.openId === input.openId && input.role !== "admin") throw new TRPCError({ code: "BAD_REQUEST", message: "You cannot remove your own administrator access." });
+      const updated = await setManagedUserRole(input.openId, input.role);
+      if (!updated) throw new TRPCError({ code: "NOT_FOUND", message: "User not found." });
+      return { success: true } as const;
+    }),
   }),
 });
 
