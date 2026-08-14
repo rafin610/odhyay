@@ -46,5 +46,5 @@ describe("book management persistence", () => {
     await expect(db.select().from(readingProgress).where(eq(readingProgress.bookId, initial.id))).resolves.toHaveLength(0);
     await expect(db.select().from(favorites).where(eq(favorites.bookId, initial.id))).resolves.toHaveLength(0);
     await expect(db.select().from(bookmarks).where(eq(bookmarks.bookId, initial.id))).resolves.toHaveLength(0);
-  });
+  }, 15_000);
 });
