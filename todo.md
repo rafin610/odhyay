@@ -90,3 +90,4 @@
 - [x] Replace Vercel frontend Manus OAuth fallbacks with Google sign-in and isolate Manus-only callback behavior from the serverless runtime.
 - [ ] Visibly re-verify the saved Vercel callback URI under Google OAuth authorized redirect URIs before release validation.
 - [x] Remove the data-seeding assumption from the administrator book-list regression test so it validates the current persisted catalog safely.
+- [ ] Fix the Vercel serverless function bundle so it resolves the Express application and restores all `/api` routes in production.

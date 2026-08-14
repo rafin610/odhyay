@@ -107,6 +107,10 @@ The dedicated Vercel project now has encrypted Production-and-Preview entries fo
 
 The Google Cloud client update was completed successfully, with the operator confirming addition of the Vercel callback and the console showing an “OAuth client saved” notification. The Vercel production origin `https://odhyay.vercel.app` is visibly saved on the existing **ODHYAY Web** OAuth client. A final direct visibility check of `https://odhyay.vercel.app/api/auth/google/callback` under the authorized redirect URI section remains tracked before release validation. The application now routes all legacy sign-in fallbacks to Google and does not register the Manus callback on Vercel; a stable local session application identifier keeps signed Google sessions valid without `VITE_APP_ID`.
 
+## Source synchronization and deployment
+
+The private GitHub `main` branch was reconciled with its previously deployed Vercel preparation commit and updated to commit `97f12bb`. The latest Vercel Production deployment was triggered from that commit and reached **Ready** status. The immutable deployment URL is `https://odhyay-emvm8w9wo-ahmedrafin014-9807s-projects.vercel.app/`; it renders the ODHYAY shell successfully. The remaining work is live data, reader, authentication, and administrator-flow validation before the release can be treated as complete.
+
 ## References
 
 [1]: https://docs.pingcap.com/tidbcloud/integrate-tidbcloud-with-vercel/ "Integrate TiDB Cloud with Vercel"
