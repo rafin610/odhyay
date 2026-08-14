@@ -1,17 +1,7 @@
 import "dotenv/config";
-import express from "express";
 import { createServer } from "http";
 import net from "net";
-import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerGoogleOAuthRoutes } from "../googleOAuth";
-import { registerCoverUploadRoute } from "../coverUpload";
-import { registerPdfUploadRoute } from "../pdfUpload";
-import { registerReaderPdfRoute } from "../pdfReader";
-import { registerVercelBlobUploadRoute } from "../vercelBlobUpload";
-import { registerOAuthRoutes } from "./oauth";
-import { registerStorageProxy } from "./storageProxy";
-import { appRouter } from "../routers";
-import { createContext } from "./context";
+import { createApp } from "../app";
 import { serveStatic, setupVite } from "./vite";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -33,28 +23,7 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
   throw new Error(`No available port found starting from ${startPort}`);
 }
 
-export function createApp() {
-  const app = express();
-  // Configure body parser with larger size limit for file uploads
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  registerStorageProxy(app);
-  if (!process.env.VERCEL) registerOAuthRoutes(app);
-  registerGoogleOAuthRoutes(app);
-  registerCoverUploadRoute(app);
-  registerPdfUploadRoute(app);
-  registerReaderPdfRoute(app);
-  registerVercelBlobUploadRoute(app);
-  // tRPC API
-  app.use(
-    "/api/trpc",
-    createExpressMiddleware({
-      router: appRouter,
-      createContext,
-    })
-  );
-  return app;
-}
+export { createApp } from "../app";
 
 async function startServer() {
   const app = createApp();
