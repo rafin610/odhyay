@@ -150,7 +150,7 @@ function vitePluginManusDebugCollector(): Plugin {
   };
 }
 
-const isVercelBuild = process.env.VERCEL === "1";
+const isVercelBuild = Boolean(process.env.VERCEL);
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), ...(!isVercelBuild ? [vitePluginManusRuntime(), vitePluginManusDebugCollector()] : [])];
 
 export default defineConfig({
