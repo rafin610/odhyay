@@ -14,7 +14,7 @@ const bookInput = z.object({
   pageCount: z.number().int().min(0).max(20_000).optional(),
   status: z.enum(["draft", "published"]),
   coverUrl: z.union([z.string().url(), z.string().regex(/^\/manus-storage\/covers\/[^?#]+$/, "Cover uploads must use a managed cover path.")]).optional(),
-  pdfKey: z.string().regex(/^books\/.+\.pdf$/, "PDF uploads must use a managed library key.").max(512).nullable().optional(),
+  pdfKey: z.union([z.string().url().max(1024), z.string().regex(/^books\/.+\.pdf$/, "PDF uploads must use a managed library key.").max(512)]).nullable().optional(),
   pdfFilename: z.string().trim().min(1).max(512).nullable().optional(),
   pdfMimeType: z.literal("application/pdf").nullable().optional(),
   pdfSize: z.number().int().positive().max(30 * 1024 * 1024).nullable().optional(),

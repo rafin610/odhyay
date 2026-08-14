@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import React from "react";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const { getDocument, renderPdfPage } = vi.hoisted(() => ({ getDocument: vi.fn(), renderPdfPage: vi.fn() }));
@@ -55,5 +55,8 @@ describe("PdfDocument", () => {
 
     expect(await screen.findByText("No reader document is attached to this book.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Open the PDF in a new tab" })).toHaveAttribute("href", "/api/reader/pdf/missing");
+    const callsBeforeRetry = getDocument.mock.calls.length;
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    await waitFor(() => expect(getDocument.mock.calls.length).toBeGreaterThan(callsBeforeRetry));
   });
 });

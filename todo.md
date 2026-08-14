@@ -66,4 +66,18 @@
 - [ ] Re-run temporary cover-image QA with verifiable rendered-image evidence on the public library card and book-detail page.
 - [x] Add direct public cover component regression tests for persisted managed cover paths.
 - [x] Commit and push the current local cover-upload implementation and QA artifacts to the private GitHub repository.
-- [ ] Sync the completed public cover regression tests and React test-runtime compatibility refinements to the private GitHub repository.
+- [x] Sync the completed public cover regression tests and React test-runtime compatibility refinements to the private GitHub repository.
+- [x] Audit desktop and mobile public, administrative, and reader experiences for responsive and interaction friction.
+- [x] Upgrade responsive layout, navigation hierarchy, mobile controls, and visual affordances across ODHYAY routes.
+- [x] Refine the reader with an interruption-free reading mode, clearer controls, and resilient PDF/document states.
+- [x] Add purposeful, accessible motion and loading feedback that respects reduced-motion preferences.
+- [x] Expand automated coverage and verify upgraded flows at desktop and mobile breakpoints before release.
+- [x] Add direct UI regression coverage for the dedicated reader route and responsive navigation behavior introduced by the UX upgrade.
+- [ ] Audit the current full-stack dependencies and Vercel serverless compatibility before any migration.
+- [ ] Select and provision a Vercel-compatible persistent database and secure file-storage architecture.
+- [ ] Export, validate, and migrate ODHYAY relational data and managed file references without data loss.
+- [ ] Adapt backend API, authentication/session handling, uploads, and PDF delivery for Vercel runtime constraints.
+- [ ] Add and pass direct regression coverage for Vercel storage activation and secure client-upload authorization.
+- [ ] Configure Vercel project settings, deployment secrets, and Google OAuth callback URLs.
+- [ ] Deploy a preview and validate public browsing, Google sign-in, administrator access, uploads, PDF reading, and persistence.
+- [ ] Confirm the production Vercel release only after all critical flows pass, retaining the existing live deployment as rollback.

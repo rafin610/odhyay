@@ -1,3 +1,6 @@
+import { upload as uploadBlob } from "@vercel/blob/client";
+import { vercelBlobUploadsEnabled } from "./vercelBlobUpload";
+
 export type StoredCover = {
   key: string;
   url: string;
@@ -15,6 +18,15 @@ export async function uploadCover(file: File): Promise<StoredCover> {
   }
   if (file.size === 0 || file.size > MAX_COVER_UPLOAD_BYTES) {
     throw new Error("Choose an image smaller than 8 MB.");
+  }
+
+  if (await vercelBlobUploadsEnabled()) {
+    const blob = await uploadBlob(`covers/${file.name}`, file, {
+      access: "public",
+      handleUploadUrl: "/api/admin/uploads/blob",
+      clientPayload: JSON.stringify({ kind: "cover" }),
+    });
+    return { key: blob.url, url: blob.url, filename: file.name, mimeType: file.type as StoredCover["mimeType"], size: file.size };
   }
 
   const response = await fetch("/api/admin/uploads/cover", {

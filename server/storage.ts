@@ -3,6 +3,11 @@
 // Downloads return /manus-storage/{key} paths served via 307 redirect.
 
 import { ENV } from "./_core/env";
+import { put } from "@vercel/blob";
+
+function useVercelBlob() {
+  return Boolean(process.env.VERCEL && (process.env.BLOB_READ_WRITE_TOKEN || (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN)));
+}
 
 function getForgeConfig() {
   const forgeUrl = ENV.forgeApiUrl;
@@ -33,6 +38,11 @@ export async function storagePut(
   data: Buffer | Uint8Array | string,
   contentType = "application/octet-stream",
 ): Promise<{ key: string; url: string }> {
+  if (useVercelBlob()) {
+    const body = data instanceof Uint8Array && !Buffer.isBuffer(data) ? Buffer.from(data) : data;
+    const blob = await put(normalizeKey(relKey), body, { access: "public", addRandomSuffix: true, contentType });
+    return { key: blob.url, url: blob.url };
+  }
   const { forgeUrl, forgeKey } = getForgeConfig();
   const key = appendHashSuffix(normalizeKey(relKey));
 
@@ -73,10 +83,12 @@ export async function storagePut(
 
 export async function storageGet(relKey: string): Promise<{ key: string; url: string }> {
   const key = normalizeKey(relKey);
+  if (/^https?:\/\//.test(key)) return { key, url: key };
   return { key, url: `/manus-storage/${key}` };
 }
 
 export async function storageGetSignedUrl(relKey: string): Promise<string> {
+  if (/^https?:\/\//.test(relKey)) return relKey;
   const { forgeUrl, forgeKey } = getForgeConfig();
   const key = normalizeKey(relKey);
 

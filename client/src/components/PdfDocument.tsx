@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { FileWarning, RefreshCw } from "lucide-react";
 import { GlobalWorkerOptions, getDocument } from "pdfjs-dist";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { readerPdfErrorMessage } from "@/lib/pdfReader";
@@ -17,6 +18,19 @@ export function PdfDocument({ url, pageNumber, zoom, onPageCount }: PdfDocumentP
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+    const updateWidth = () => setContainerWidth(Math.max(260, element.clientWidth));
+    updateWidth();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -28,19 +42,17 @@ export function PdfDocument({ url, pageNumber, zoom, onPageCount }: PdfDocumentP
       setError(null);
       try {
         const document = await loadingTask.promise;
-        if (cancelled) {
-          return;
-        }
+        if (cancelled) return;
         onPageCount(document.numPages);
         const pdfPage = await document.getPage(Math.min(Math.max(1, pageNumber), document.numPages));
-        const containerWidth = Math.max(260, containerRef.current?.clientWidth ?? 720);
+        const width = Math.max(260, containerWidth || containerRef.current?.clientWidth || 720);
         const initialViewport = pdfPage.getViewport({ scale: 1 });
-        const scale = Math.min(containerWidth / initialViewport.width, 1.35) * zoom;
+        const scale = Math.min(width / initialViewport.width, 1.35) * zoom;
         const viewport = pdfPage.getViewport({ scale });
         const canvas = canvasRef.current;
         const context = canvas?.getContext("2d", { alpha: false });
         if (!canvas || !context || cancelled) return;
-        const pixelRatio = window.devicePixelRatio || 1;
+        const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
         canvas.width = Math.floor(viewport.width * pixelRatio);
         canvas.height = Math.floor(viewport.height * pixelRatio);
         canvas.style.width = `${Math.floor(viewport.width)}px`;
@@ -60,8 +72,11 @@ export function PdfDocument({ url, pageNumber, zoom, onPageCount }: PdfDocumentP
       renderTask?.cancel();
       void loadingTask.destroy();
     };
-  }, [onPageCount, pageNumber, url, zoom]);
+  }, [attempt, containerWidth, onPageCount, pageNumber, url, zoom]);
 
-  if (error) return <div className="px-7 py-14 text-center text-sm text-[#8f8996]"><p>{readerPdfErrorMessage(error)}</p><a href={url} target="_blank" rel="noreferrer" className="mt-4 inline-block border-b border-current pb-1 text-[#b7a4d7]">Open the PDF in a new tab</a></div>;
-  return <div ref={containerRef} className="relative flex min-h-[420px] w-full items-center justify-center overflow-auto bg-[#f5f0e7] p-3 sm:p-6" aria-busy={loading}><canvas ref={canvasRef} className="block max-w-none shadow-[0_12px_32px_rgba(0,0,0,.22)]" aria-label={`PDF page ${pageNumber}`} />{loading && <span className="absolute inset-0 grid place-items-center bg-[#f5f0e7]/80 text-xs font-semibold uppercase tracking-[.16em] text-[#625b64]">Rendering page…</span>}</div>;
+  if (error) {
+    return <section role="alert" className="px-6 py-12 text-center sm:px-10"><FileWarning size={26} className="mx-auto text-[#b7a4d7]" /><p className="mt-5 font-display text-2xl text-[#e8e0ea]">This page could not open.</p><p className="mx-auto mt-3 max-w-md text-sm leading-7 text-[#a79eab]">{readerPdfErrorMessage(error)}</p><div className="mt-7 flex flex-wrap justify-center gap-4"><button onClick={() => setAttempt(value => value + 1)} className="focus-ring inline-flex min-h-10 items-center gap-2 border border-[#51465c] px-3 py-2 text-xs font-semibold text-[#e6ddeb] hover:border-amethyst"><RefreshCw size={14} /> Try again</button><a href={url} target="_blank" rel="noreferrer" className="focus-ring inline-flex min-h-10 items-center border-b border-current px-1 py-2 text-xs font-semibold text-[#b7a4d7]">Open the PDF in a new tab</a></div></section>;
+  }
+
+  return <div ref={containerRef} className="relative flex min-h-[360px] w-full items-center justify-center overflow-auto bg-[#f5f0e7] p-2 sm:min-h-[420px] sm:p-6" aria-busy={loading} aria-live="polite"><canvas ref={canvasRef} className="block max-w-none shadow-[0_12px_32px_rgba(0,0,0,.22)]" aria-label={`PDF page ${pageNumber}`} />{loading && <div className="absolute inset-0 grid place-items-center bg-[#f5f0e7]/88"><span className="loading-shimmer px-4 py-3 text-xs font-semibold uppercase tracking-[.16em] text-[#625b64]">Rendering page {pageNumber}…</span></div>}</div>;
 }

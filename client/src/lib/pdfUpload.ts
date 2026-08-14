@@ -1,3 +1,6 @@
+import { upload as uploadBlob } from "@vercel/blob/client";
+import { vercelBlobUploadsEnabled } from "./vercelBlobUpload";
+
 export type StoredPdf = {
   key: string;
   filename: string;
@@ -13,6 +16,15 @@ export async function uploadPdf(file: File): Promise<StoredPdf> {
   }
   if (file.size === 0 || file.size > MAX_PDF_UPLOAD_BYTES) {
     throw new Error("Choose a PDF smaller than 30 MB.");
+  }
+
+  if (await vercelBlobUploadsEnabled()) {
+    const blob = await uploadBlob(`books/${file.name}`, file, {
+      access: "public",
+      handleUploadUrl: "/api/admin/uploads/blob",
+      clientPayload: JSON.stringify({ kind: "pdf" }),
+    });
+    return { key: blob.url, filename: file.name, mimeType: "application/pdf", size: file.size };
   }
 
   const response = await fetch("/api/admin/uploads/pdf", {

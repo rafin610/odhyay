@@ -12,7 +12,7 @@ const LibraryPersistentPage = lazy(async () => ({ default: (await loadPersistent
 const CategoriesPersistentPage = lazy(async () => ({ default: (await loadPersistent()).CategoriesPersistentPage }));
 const SearchPersistentPage = lazy(async () => ({ default: (await loadPersistent()).SearchPersistentPage }));
 const BookPersistentPage = lazy(async () => ({ default: (await loadPersistent()).BookPersistentPage }));
-const ReaderPersistentPage = lazy(async () => ({ default: (await loadPersistent()).ReaderPersistentPage }));
+const ReaderPersistentPage = lazy(() => import("./pages/ReaderExperience"));
 const AboutPage = lazy(async () => ({ default: (await import("./pages/Odhyay")).AboutPage }));
 const NotFound = lazy(() => import("./pages/NotFound"));
 

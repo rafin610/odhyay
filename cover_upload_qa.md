@@ -12,3 +12,12 @@
 - Delivery diagnosis: the managed cover URL returned a signed storage redirect and `image/png` content successfully. The initial detail screenshot occurred before the image finished loading; the subsequent detail view rendered the expected QA cover.
 - Public verification: the temporary book was included in the public library query and its managed cover rendered successfully on the public book-detail page.
 - Cleanup: the temporary book was deleted through the administrator confirmation flow, and the now-unreferenced `ODHYAY QA` author and `Cover QA` category were removed. The managed image is intentionally unreferenced.
+
+## Second-pass rendered-image evidence (in progress)
+
+- Date: 2026-08-13
+- Approval: the administrator approved a new temporary upload/create/delete flow specifically to capture direct visual evidence on both public surfaces.
+- Administrator session: authenticated as Ahmed Rafin on the preview domain.
+- Temporary record setup: `Visual Cover Render QA` by `ODHYAY Visual QA`, in `Visual Cover QA`, with one page and an explicitly temporary QA description.
+- Form confirmation: `/admin/books/new` exposed the local JPEG/PNG/WebP cover chooser and no manual cover-URL field.
+- Upload evidence: the first candidate exposed a deliberate MIME/signature mismatch because its `.jpg` extension contained PNG bytes; a verified PNG fixture was then accepted. The administrator form displayed the stored-image thumbnail with replacement and removal controls and a successful secure-storage notification.
