@@ -26,6 +26,15 @@ function normalizeKey(relKey: string): string {
   return relKey.replace(/^\/+/, "");
 }
 
+export function isTrustedVercelBlobUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname.endsWith(".public.blob.vercel-storage.com") && url.pathname.length > 1;
+  } catch {
+    return false;
+  }
+}
+
 function appendHashSuffix(relKey: string): string {
   const hash = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
   const lastDot = relKey.lastIndexOf(".");
@@ -88,7 +97,12 @@ export async function storageGet(relKey: string): Promise<{ key: string; url: st
 }
 
 export async function storageGetSignedUrl(relKey: string): Promise<string> {
-  if (/^https?:\/\//.test(relKey)) return relKey;
+  if (/^https?:\/\//.test(relKey)) {
+    if (process.env.VERCEL && !isTrustedVercelBlobUrl(relKey)) {
+      throw new Error("Vercel PDF storage must use an approved Vercel Blob URL.");
+    }
+    return relKey;
+  }
   const { forgeUrl, forgeKey } = getForgeConfig();
   const key = normalizeKey(relKey);
 

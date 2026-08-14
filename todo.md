@@ -73,11 +73,19 @@
 - [x] Add purposeful, accessible motion and loading feedback that respects reduced-motion preferences.
 - [x] Expand automated coverage and verify upgraded flows at desktop and mobile breakpoints before release.
 - [x] Add direct UI regression coverage for the dedicated reader route and responsive navigation behavior introduced by the UX upgrade.
-- [ ] Audit the current full-stack dependencies and Vercel serverless compatibility before any migration.
-- [ ] Select and provision a Vercel-compatible persistent database and secure file-storage architecture.
-- [ ] Export, validate, and migrate ODHYAY relational data and managed file references without data loss.
-- [ ] Adapt backend API, authentication/session handling, uploads, and PDF delivery for Vercel runtime constraints.
-- [ ] Add and pass direct regression coverage for Vercel storage activation and secure client-upload authorization.
-- [ ] Configure Vercel project settings, deployment secrets, and Google OAuth callback URLs.
+- [x] Audit the current full-stack dependencies and Vercel serverless compatibility before any migration.
+- [x] Select and provision a Vercel-compatible persistent database and secure file-storage architecture.
+- [x] Export, validate, and migrate ODHYAY relational data and managed file references without data loss.
+- [x] Harden Vercel file storage with protected upload credentials and same-origin PDF delivery or equivalent access control.
+- [x] Run and record complete source-versus-TiDB migration integrity checks for records, roles, relationships, and managed-file references.
+- [x] Adapt backend API, authentication/session handling, uploads, and PDF delivery for Vercel runtime constraints.
+- [x] Add and pass direct regression coverage for Vercel storage activation and secure client-upload authorization.
+- [x] Add and pass direct regression coverage for TiDB public-endpoint TLS connection selection.
+- [x] Provision a dedicated Vercel Blob store and migrate existing managed cover/PDF objects before replacing legacy storage references.
+- [x] Configure Vercel project settings, deployment secrets, and Google OAuth callback URLs.
 - [ ] Deploy a preview and validate public browsing, Google sign-in, administrator access, uploads, PDF reading, and persistence.
 - [ ] Confirm the production Vercel release only after all critical flows pass, retaining the existing live deployment as rollback.
+- [x] Correct Blob-compatible PDF book validation to prevent Vercel tRPC startup failure.
+- [x] Add and run row-level source-versus-TiDB parity checks for identities, entity records, reading progress, bookmarks, foreign keys, and media references.
+- [x] Replace Vercel frontend Manus OAuth fallbacks with Google sign-in and isolate Manus-only callback behavior from the serverless runtime.
+- [ ] Visibly re-verify the saved Vercel callback URI under Google OAuth authorized redirect URIs before release validation.

@@ -170,7 +170,9 @@ class SDKServer {
     return this.signSession(
       {
         openId,
-        appId: ENV.appId,
+        // A stable local identifier keeps Google-only Vercel sessions valid
+        // without coupling them to Manus OAuth configuration.
+        appId: ENV.appId || "odhyay",
         name: options.name || "",
       },
       options

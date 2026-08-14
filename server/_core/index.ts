@@ -39,7 +39,7 @@ export function createApp() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
-  registerOAuthRoutes(app);
+  if (!process.env.VERCEL) registerOAuthRoutes(app);
   registerGoogleOAuthRoutes(app);
   registerCoverUploadRoute(app);
   registerPdfUploadRoute(app);

@@ -1,5 +1,6 @@
 import { and, desc, eq, like, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import { createPool } from "mysql2/promise";
 import { authors, bookmarks, books, categories, favorites, InsertUser, readingProgress, users } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -7,8 +8,33 @@ let connection: ReturnType<typeof drizzle> | null = null;
 const unsafeSlugCharacters = new RegExp("[^\\p{L}\\p{M}\\p{N}\\s-]", "gu");
 const slugWhitespace = new RegExp("\\s+", "gu");
 
+export function usesTiDbPublicEndpoint(databaseUrl: string) {
+  return databaseUrl.includes(".tidbcloud.com");
+}
+
+function createTiDbConnection(databaseUrl: string) {
+  const url = new URL(databaseUrl);
+  return drizzle({
+    client: createPool({
+      host: url.hostname,
+      port: Number(url.port || 4000),
+      user: decodeURIComponent(url.username),
+      password: decodeURIComponent(url.password),
+      database: decodeURIComponent(url.pathname.replace(/^\//, "")),
+      ssl: { minVersion: "TLSv1.2", rejectUnauthorized: true },
+      waitForConnections: true,
+      connectionLimit: 5,
+      enableKeepAlive: true,
+    }),
+  }) as unknown as ReturnType<typeof drizzle>;
+}
+
 export async function getDb() {
-  if (!connection && process.env.DATABASE_URL) connection = drizzle(process.env.DATABASE_URL);
+  if (!connection && process.env.DATABASE_URL) {
+    connection = usesTiDbPublicEndpoint(process.env.DATABASE_URL)
+      ? createTiDbConnection(process.env.DATABASE_URL)
+      : drizzle(process.env.DATABASE_URL);
+  }
   return connection;
 }
 

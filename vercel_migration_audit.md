@@ -40,7 +40,72 @@ The read-only inventory captured immediately before migration contains four user
 
 ## Dedicated Vercel project setup status
 
-The approved browser workflow has reached Vercel’s new-project configuration screen for the correct private source repository, `rafin610/odhyay`, on the `main` branch. No deployment, database connection, storage store, or environment variable has been created from that screen yet. The default Vite preset is not sufficient for this full-stack project, so deployment remains intentionally paused until the Express function, API rewrites, external database connection, and Blob-backed upload design have been implemented and reviewed.
+The approved browser workflow has reached Vercel’s new-project configuration screen for the correct private source repository, `rafin610/odhyay`, on the `main` branch, with Vite selected and the project name `odhyay`. The source was synchronized to GitHub commit `56bc16a87bdd9a8354af8c3ab2df4990649e101d` before the approved initialization step. The user has confirmed initial deployment creation; database connection, storage store, and environment variables are still intentionally absent until the project exists and each secure dependency can be connected to it.
+
+Vercel’s configuration form now exposes the approved **Deploy** control for this dedicated project. The build/output and environment sections are intentionally left untouched at this initialization step because the target database and secret values must be created or entered after project creation.
+
+The approved initial deployment has been submitted as Vercel deployment `dpl_GNSTuYHERaPbJQf1ceTivEtxfNYf` from commit `56bc16a`. Its build status is pending at the time of this record; it is expected to become a configuration-only deployment until external persistence and secrets are attached.
+
+Vercel successfully cloned the private repository and completed dependency installation with the project’s pinned pnpm/TypeScript toolchain. The initial build has entered its transform stage; no deployment result is recorded yet.
+
+The initial deployment completed successfully and Vercel generated the dedicated project URL `https://odhyay-8f5ff3iad-ahmedrafin014-9807s-projects.vercel.app`. The static application shell renders there; data-backed and authenticated flows remain intentionally unverified until database, Blob storage, and secrets are configured.
+
+The approved TiDB integration dialog is open. It requires selection of the `ahmedrafin014-9807's projects` Vercel team and offers all-projects or specific-project access. The migration will select only the dedicated `odhyay` project rather than grant access to existing unrelated projects.
+
+The team and the dedicated `odhyay` project have been selected under the specific-project permission scope. Vercel changed the submit action to **Resume**, indicating an external TiDB authorization handoff. The continuation did not complete automatically in the connected browser session, so account authentication or consent must be completed by the user before provisioning can proceed.
+
+After the user reported completion, the Vercel integration dialog still displayed the same pending **Resume** state. A fresh continuation attempt did not advance the flow, so no TiDB cluster, Vercel `DATABASE_URL`, or import target is available yet.
+
+The available browser is authenticated to TiDB Cloud as Ahmed Rafin in `Ahmed's Org`. The `My TiDB` inventory currently contains no resources, confirming that a new TiDB Serverless resource must be provisioned before data migration can begin.
+
+TiDB Cloud’s resource form initially selected the paid Essential plan. This was changed to the Starter plan, which specifies a $0 monthly spending limit, Tokyo region, no credit card requirement, and automatic throttling if the included free quota is exhausted. The existing relational inventory is small enough for the initial migration to remain within that protected configuration.
+
+The approved migration target is named `odhyay-library-db`; it remains on AWS Tokyo under the free Starter plan with the $0 spending limit. Resource creation is pending the final approved form submission.
+
+The TiDB Starter resource was created successfully with instance ID `10244776892659937403`. Its current status is **Creating**, with zero request units and zero storage usage. The next migration action will wait until the instance becomes active, then retrieve a secure connection URL without exposing its credentials.
+
+The instance became active and the target database `odhyay` was created through TiDB’s SQL Editor. The full table-definition script is loaded and validated for execution; the editor’s initial single-statement run created only the database, so the remaining `USE odhyay` and table statements will be executed together next.
+
+All seven required tables were created successfully in the TiDB `odhyay` database, including their primary keys, unique constraints, indexes, and foreign-key references. The relational import also completed without errors: four user identities (including both administrator roles), five authors, five categories, one published book, four reading-progress records, and one bookmark were preserved with original IDs and timestamps. There are no source favorites to migrate. Legacy managed-storage references are intentionally retained temporarily until the secure Vercel Blob object migration is complete.
+
+The dedicated `odhyay-media` Vercel Blob store has been provisioned in `iad1` with public access, matching the current library's public-cover and public-reader delivery design. It is connected only to the `odhyay` Vercel project in Production and Preview environments. Vercel injected `BLOB_STORE_ID` and `BLOB_WEBHOOK_PUBLIC_KEY`; the current serverless path will require either the resulting OIDC system token or an explicit read-write token to enable uploads. The existing JPEG cover (40 KB) and PDF (637 KB) were retrieved from the current live-compatible environment into local migration staging and verified as `image/jpeg` and `application/pdf` respectively, ready for approved Blob import.
+
+The Vercel dashboard’s manual upload control did not expose a browser-accessible file input, so media migration will use the store’s managed server credential rather than a manual browser upload. The existing project connection currently exposes only `BLOB_STORE_ID` and `BLOB_WEBHOOK_PUBLIC_KEY`; a read-write token must be added or the Vercel OIDC system token confirmed before the staged objects can be inserted through the supported Blob SDK.
+
+Using the store’s managed read-write credential, the staged objects were successfully copied to public Vercel Blob URLs without filename randomization: `covers/migrated/ai-for-student-cover.jpg` (40,553 bytes) and `books/migrated/ai-for-student.pdf` (651,790 bytes). The next data-migration statement will replace only the corresponding TiDB book `coverUrl` and `pdfKey` values with these Blob URLs; original metadata and all relationship IDs remain unchanged.
+
+The TiDB target record for `ai-for-student` now references the migrated Blob cover and PDF URLs, while preserving `pdf.pdf`, `application/pdf`, and the original 651,790-byte size metadata. Direct HTTPS retrieval verifies `200 OK` with `image/jpeg` (40,553 bytes) for the cover and `application/pdf` (651,790 bytes) for the PDF. The relational database and managed media migration are therefore complete and independently retrievable; the next phase is Vercel runtime configuration and end-to-end application validation.
+
+## Source-versus-TiDB integrity verification
+
+On 14 August 2026, the read-only source inventory was compared with the dedicated TiDB target by executing `scripts/verifyTiDbMigration.mjs` against TiDB and querying the source database directly. All expected entity counts match, both administrator identities retained their roles, and the migrated book retains its PDF metadata while pointing to the intended Vercel Blob objects.
+
+| Entity or reference | Source | TiDB target | Result |
+|---|---:|---:|---|
+| Users | 4 | 4 | Matched |
+| Authors | 5 | 5 | Matched |
+| Categories | 5 | 5 | Matched |
+| Books | 1 | 1 | Matched |
+| Reading-progress records | 4 | 4 | Matched |
+| Bookmarks | 1 | 1 | Matched |
+| Favorites | 0 | 0 | Matched |
+| Administrators | `google:100673852661440648928`, `google:115012525577847235158` | Same two identities, both `admin` | Matched |
+| Book cover reference | Legacy managed object | Vercel Blob `covers/migrated/ai-for-student-cover.jpg` | Expected replacement, HTTP 200 verified |
+| Book PDF reference | Legacy managed object | Vercel Blob `books/migrated/ai-for-student.pdf` | Expected replacement; filename, MIME type, and 651,790-byte size retained |
+
+The migration is integrity-complete at the data and object-reference level. The legacy Manus deployment remains active and unchanged as the rollback path. Vercel runtime, authentication, and browser-flow validation remain required before any production cutover.
+
+### Complete row-level parity outcome
+
+The initial detailed comparison identified only expected or live-operation timestamp drift: the Blob-reference update changed the target book timestamp, while continued activity on the still-live Manus deployment advanced one user session and one reading-progress timestamp. The live session and progress timestamps were synchronized to TiDB through an ID-validated transaction. The book’s `updatedAt` is intentionally normalized only for the parity comparison because its target-side Blob reference is a deliberate replacement of the source’s managed-storage reference; every other book field, including identity, author/category relationships, publication state, and PDF metadata, remains exact.
+
+The final `verifySourceToTiDbParity.mjs` run passed with matching canonical row digests for all seven tables: users, authors, categories, books, reading progress, favorites, and bookmarks. It also validated all eight relationship directions—book-to-author, optional book-to-category, and user/book references for progress, favorites, and bookmarks—with zero orphaned rows. This completes the lossless relational migration proof and preserves the newly migrated immutable Blob paths as the only approved object-reference difference.
+
+## Production configuration progress
+
+The dedicated Vercel project now has encrypted Production-and-Preview entries for the TiDB connection string, a new Vercel-only JWT session-signing secret, Google OAuth client ID and client secret, the Blob write credential, and the administrator identity. Vercel-injected Blob store identifiers remain scoped to Production and Preview. The Google Cloud project’s existing **ODHYAY Web** OAuth client is open for configuration; its Vercel redirect URI will be added next before deployment is triggered. No secret values are recorded in this audit.
+
+The Google Cloud client update was completed successfully, with the operator confirming addition of the Vercel callback and the console showing an “OAuth client saved” notification. The Vercel production origin `https://odhyay.vercel.app` is visibly saved on the existing **ODHYAY Web** OAuth client. A final direct visibility check of `https://odhyay.vercel.app/api/auth/google/callback` under the authorized redirect URI section remains tracked before release validation. The application now routes all legacy sign-in fallbacks to Google and does not register the Manus callback on Vercel; a stable local session application identifier keeps signed Google sessions valid without `VITE_APP_ID`.
 
 ## References
 
