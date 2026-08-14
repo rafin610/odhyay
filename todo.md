@@ -89,3 +89,4 @@
 - [x] Add and run row-level source-versus-TiDB parity checks for identities, entity records, reading progress, bookmarks, foreign keys, and media references.
 - [x] Replace Vercel frontend Manus OAuth fallbacks with Google sign-in and isolate Manus-only callback behavior from the serverless runtime.
 - [ ] Visibly re-verify the saved Vercel callback URI under Google OAuth authorized redirect URIs before release validation.
+- [x] Remove the data-seeding assumption from the administrator book-list regression test so it validates the current persisted catalog safely.

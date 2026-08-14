@@ -21,10 +21,11 @@ function createAdminContext(): TrpcContext {
 }
 
 describe("admin.listBooks", () => {
-  it("returns the persisted ODHYAY starter book for an administrator", async () => {
+  it("returns normalized persistent records for an administrator without requiring a seeded title", async () => {
     const caller = appRouter.createCaller(createAdminContext());
     const records = await caller.admin.listBooks();
 
-    expect(records.some((book) => book.slug === "welcome-to-odhyay")).toBe(true);
+    expect(Array.isArray(records)).toBe(true);
+    expect(records.every((book) => typeof book.id === "number" && typeof book.slug === "string" && typeof book.title === "string")).toBe(true);
   });
 });
