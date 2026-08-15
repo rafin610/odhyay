@@ -123,6 +123,12 @@ The resulting production deployment completed successfully and `/api/trpc/librar
 
 The private GitHub `main` branch was reconciled with its previously deployed Vercel preparation commit and updated to commit `97f12bb`. The latest Vercel Production deployment was triggered from that commit and reached **Ready** status. The immutable deployment URL is `https://odhyay-emvm8w9wo-ahmedrafin014-9807s-projects.vercel.app/`; it renders the ODHYAY shell successfully. The remaining work is live data, reader, authentication, and administrator-flow validation before the release can be treated as complete.
 
+## Serverless module-resolution remediation
+
+The Vercel function log conclusively identified two sequential Node ESM resolution failures. First, the root function could not resolve the extensionless `server/app` import. After adding explicit `.js` local specifiers, the function advanced to the next dependency and reported that the TypeScript-only `@shared/const` path alias could not be resolved from `server/_core/sdk.js`. The deployment source now uses explicit relative `.js` specifiers across the traced server graph and replaces every server-runtime `@shared/*` alias with a Node-resolvable relative import. The Manus-only storage proxy route is also not registered under `VERCEL`.
+
+A direct regression test now reads every runtime module in the Vercel trace, rejects `@shared/*` aliases, and requires explicit `.js` suffixes for local imports. The repair passes the complete suite (**28 files / 45 tests**), TypeScript type checking, and the Vercel-specific frontend build. The next production deployment must still prove the function starts, serves `/api/trpc/library.list`, and can reach TiDB before broader browser-flow validation proceeds.
+
 ## References
 
 [1]: https://docs.pingcap.com/tidbcloud/integrate-tidbcloud-with-vercel/ "Integrate TiDB Cloud with Vercel"

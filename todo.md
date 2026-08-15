@@ -95,3 +95,4 @@
 - [ ] Diagnose and fix the Vercel Function invocation crash now reached by `/api/trpc/library.list` after Express routing was enabled.
 - [x] Diagnose and stabilize the persisted book-management integration test timeout observed during the Vercel-output verification run.
 - [x] Add explicit Node ESM import specifiers throughout the Vercel serverless application dependency graph and cover the rule with a direct regression test.
+- [x] Replace server-runtime TypeScript path aliases with deployable relative ESM imports after Vercel function logs identified an unresolved `@shared/const` module.

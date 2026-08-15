@@ -27,6 +27,7 @@ describe("Vercel ESM runtime imports", () => {
       const source = await readFile(new URL(`../${file}`, import.meta.url), "utf8");
       const specifiers = [...source.matchAll(/from\s+["'](\.{1,2}\/[^"']+)["']/g)].map((match) => match[1]);
 
+      expect(source, file).not.toMatch(/@shared\//);
       for (const specifier of specifiers) {
         expect(specifier, `${file}: ${specifier}`).toMatch(/\.js$/);
       }
