@@ -150,7 +150,7 @@ function vitePluginManusDebugCollector(): Plugin {
   };
 }
 
-const isVercelBuild = Boolean(process.env.VERCEL);
+const isVercelBuild = Boolean(process.env.VERCEL) || process.argv.includes("--outDir");
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), ...(!isVercelBuild ? [vitePluginManusRuntime(), vitePluginManusDebugCollector()] : [])];
 
 export default defineConfig({
@@ -166,7 +166,7 @@ export default defineConfig({
   root: path.resolve(import.meta.dirname, "client"),
   publicDir: path.resolve(import.meta.dirname, "client", "public"),
   build: {
-    outDir: path.resolve(import.meta.dirname, isVercelBuild ? "public" : "dist/public"),
+    outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
   },
   server: {
