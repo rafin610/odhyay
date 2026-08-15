@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
-import { getBookBySlug } from "./db";
-import { storageGetSignedUrl } from "./storage";
-import { HttpError } from "../shared/_core/errors";
+import { getBookBySlug } from "./db.js";
+import { storageGetSignedUrl } from "./storage.js";
+import { HttpError } from "../shared/_core/errors.js";
 
 type ReaderPdfDependencies = {
   findBook: typeof getBookBySlug;

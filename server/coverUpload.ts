@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 import type { Express, Request, Response } from "express";
-import { HttpError } from "../shared/_core/errors";
-import { sdk } from "./_core/sdk";
-import { hasSameOrigin } from "./pdfUpload";
-import { storagePut } from "./storage";
+import { HttpError } from "../shared/_core/errors.js";
+import { sdk } from "./_core/sdk.js";
+import { hasSameOrigin } from "./pdfUpload.js";
+import { storagePut } from "./storage.js";
 
 export const MAX_COVER_UPLOAD_BYTES = 8 * 1024 * 1024;
 

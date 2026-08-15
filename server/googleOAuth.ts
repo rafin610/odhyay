@@ -1,11 +1,11 @@
 import { randomBytes, timingSafeEqual } from "crypto";
 import { parse as parseCookieHeader } from "cookie";
 import type { Express, Request, Response } from "express";
-import { COOKIE_NAME, ONE_YEAR_MS } from "../shared/const";
-import * as db from "./db";
-import { getSessionCookieOptions } from "./_core/cookies";
-import { ENV } from "./_core/env";
-import { sdk } from "./_core/sdk";
+import { COOKIE_NAME, ONE_YEAR_MS } from "../shared/const.js";
+import * as db from "./db.js";
+import { getSessionCookieOptions } from "./_core/cookies.js";
+import { ENV } from "./_core/env.js";
+import { sdk } from "./_core/sdk.js";
 
 const GOOGLE_STATE_COOKIE = "__Host-google_oauth_state";
 const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";

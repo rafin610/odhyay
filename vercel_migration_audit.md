@@ -117,6 +117,8 @@ The corrected static deployment completed successfully but `/api/trpc/*` still r
 
 The first Express-preset deployment showed that an explicit **Output Directory** makes Vercel search that directory for `server.ts`, which is not compatible with the root Express entrypoint. The output override was therefore disabled and saved. The active project settings now use the **Express** framework preset, retain the explicit `pnpm build:vercel` build command, and leave **Output Directory** unset so Vercel can discover the root `server.ts` while the build still produces a `public/` static-asset folder.
 
+The resulting production deployment completed successfully and `/api/trpc/library.list` now resolves to the Express function rather than returning a Vercel platform 404. Its first invocation returned `500 FUNCTION_INVOCATION_FAILED`, so routing is confirmed but a runtime initialization issue remains. The next step is to inspect the Vercel function log and remediate the specific crash before attempting browser-flow validation.
+
 ## Source synchronization and deployment
 
 The private GitHub `main` branch was reconciled with its previously deployed Vercel preparation commit and updated to commit `97f12bb`. The latest Vercel Production deployment was triggered from that commit and reached **Ready** status. The immutable deployment URL is `https://odhyay-emvm8w9wo-ahmedrafin014-9807s-projects.vercel.app/`; it renders the ODHYAY shell successfully. The remaining work is live data, reader, authentication, and administrator-flow validation before the release can be treated as complete.

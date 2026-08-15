@@ -1,7 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
-import { sdk } from "./_core/sdk";
-import { hasSameOrigin } from "./pdfUpload";
+import { sdk } from "./_core/sdk.js";
+import { hasSameOrigin } from "./pdfUpload.js";
 
 type UploadKind = "cover" | "pdf";
 

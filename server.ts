@@ -1,5 +1,5 @@
 import express from "express";
-import { createApp } from "./server/app";
+import { createApp } from "./server/app.js";
 
 // Vercel detects this root Express entrypoint and traces the complete server
 // dependency graph into one Node.js function. The app factory keeps local

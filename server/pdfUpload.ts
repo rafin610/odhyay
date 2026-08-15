@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import type { Express, Request, Response } from "express";
-import { storagePut } from "./storage";
-import { sdk } from "./_core/sdk";
-import { HttpError } from "../shared/_core/errors";
+import { storagePut } from "./storage.js";
+import { sdk } from "./_core/sdk.js";
+import { HttpError } from "../shared/_core/errors.js";
 
 export const MAX_PDF_UPLOAD_BYTES = 30 * 1024 * 1024;
 

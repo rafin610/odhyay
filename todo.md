@@ -91,5 +91,7 @@
 - [ ] Visibly re-verify the saved Vercel callback URI under Google OAuth authorized redirect URIs before release validation.
 - [x] Remove the data-seeding assumption from the administrator book-list regression test so it validates the current persisted catalog safely.
 - [ ] Fix the Vercel serverless function bundle so it resolves the Express application and restores all `/api` routes in production.
-- [ ] Change the Vercel project framework preset from static Vite to Express so the root server entrypoint receives `/api` traffic alongside generated public assets.
+- [x] Change the Vercel project framework preset from static Vite to Express so the root server entrypoint receives `/api` traffic alongside generated public assets.
+- [ ] Diagnose and fix the Vercel Function invocation crash now reached by `/api/trpc/library.list` after Express routing was enabled.
 - [x] Diagnose and stabilize the persisted book-management integration test timeout observed during the Vercel-output verification run.
+- [x] Add explicit Node ESM import specifiers throughout the Vercel serverless application dependency graph and cover the rule with a direct regression test.

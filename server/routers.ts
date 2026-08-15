@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { COOKIE_NAME } from "@shared/const";
 import { TRPCError } from "@trpc/server";
-import { getSessionCookieOptions } from "./_core/cookies";
-import { systemRouter } from "./_core/systemRouter";
-import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { addBookmark, createBook, deleteBook, getBookBySlug, listBooks, listCategories, listManagedUsers, setManagedUserRole, toggleFavorite, updateBook, updateReadingProgress } from "./db";
+import { getSessionCookieOptions } from "./_core/cookies.js";
+import { systemRouter } from "./_core/systemRouter.js";
+import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc.js";
+import { addBookmark, createBook, deleteBook, getBookBySlug, listBooks, listCategories, listManagedUsers, setManagedUserRole, toggleFavorite, updateBook, updateReadingProgress } from "./db.js";
 
 const bookInput = z.object({
   title: z.string().trim().min(1).max(400),

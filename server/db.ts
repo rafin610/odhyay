@@ -1,8 +1,8 @@
 import { and, desc, eq, like, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { createPool } from "mysql2/promise";
-import { authors, bookmarks, books, categories, favorites, InsertUser, readingProgress, users } from "../drizzle/schema";
-import { ENV } from "./_core/env";
+import { authors, bookmarks, books, categories, favorites, InsertUser, readingProgress, users } from "../drizzle/schema.js";
+import { ENV } from "./_core/env.js";
 
 let connection: ReturnType<typeof drizzle> | null = null;
 const unsafeSlugCharacters = new RegExp("[^\\p{L}\\p{M}\\p{N}\\s-]", "gu");
