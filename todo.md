@@ -90,15 +90,22 @@
 - [x] Replace Vercel frontend Manus OAuth fallbacks with Google sign-in and isolate Manus-only callback behavior from the serverless runtime.
 - [ ] Visibly re-verify the saved Vercel callback URI under Google OAuth authorized redirect URIs before release validation.
 - [x] Remove the data-seeding assumption from the administrator book-list regression test so it validates the current persisted catalog safely.
-- [ ] Fix the Vercel serverless function bundle so it resolves the Express application and restores all `/api` routes in production.
+- [x] Fix the Vercel serverless function bundle so it resolves the Express application and restores all `/api` routes in production.
 - [x] Change the Vercel project framework preset from static Vite to Express so the root server entrypoint receives `/api` traffic alongside generated public assets.
-- [ ] Diagnose and fix the Vercel Function invocation crash now reached by `/api/trpc/library.list` after Express routing was enabled.
+- [x] Diagnose and fix the Vercel Function invocation crash now reached by `/api/trpc/library.list` after Express routing was enabled.
 - [x] Diagnose and stabilize the persisted book-management integration test timeout observed during the Vercel-output verification run.
 - [x] Add explicit Node ESM import specifiers throughout the Vercel serverless application dependency graph and cover the rule with a direct regression test.
 - [x] Replace server-runtime TypeScript path aliases with deployable relative ESM imports after Vercel function logs identified an unresolved `@shared/const` module.
-- [ ] Produce a complete architecture, dependency, data-flow, and deployment map for the current ODHYAY implementation.
-- [ ] Resolve the Vercel static SPA delivery defect while preserving working serverless API routes.
-- [ ] Audit the repository for incomplete, dead, insecure, or production-risky code paths and correct confirmed defects.
-- [ ] Reconcile schema expectations, TiDB persistence behavior, Blob media access, and public/admin API contracts.
+- [x] Produce a complete architecture, dependency, data-flow, and deployment map for the current ODHYAY implementation.
+- [x] Resolve the Vercel static SPA delivery defect while preserving working serverless API routes.
+- [x] Audit the repository for incomplete, dead, insecure, or production-risky code paths and correct confirmed defects.
+- [x] Move authenticated-user storage synchronization out of render computation and keep it safe when browser storage is unavailable.
+- [x] Guard reader-theme browser storage reads and writes so privacy-restricted browser contexts retain a usable reader.
+- [x] Add a final Express error boundary so unhandled route failures are logged and return a safe JSON response.
+- [x] Remove confirmed unused vulnerable runtime dependencies and re-run the production dependency audit.
+- [x] Replace legacy unnamed Express wildcard fallbacks with Express 5-compatible named wildcard routes.
+- [x] Reconcile schema expectations, TiDB persistence behavior, Blob media access, and public/admin API contracts.
+- [ ] Validate production API contracts beyond `library.list`, including auth state, reader PDF delivery, and administrator upload authorization.
+- [ ] Commit the production-readiness audit artifact and final repository-wide audit evidence before release checkpointing.
 - [ ] Validate visitor, authenticated-user, and administrator production journeys, including reader and media paths.
 - [ ] Record residual risks and verified outcomes in the Vercel migration audit before the final checkpoint.

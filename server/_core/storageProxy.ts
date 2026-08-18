@@ -1,9 +1,17 @@
 import type { Express } from "express";
 import { ENV } from "./env.js";
 
+export function firstRouteParameter(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export function routePathParameter(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value.join("/") : value;
+}
+
 export function registerStorageProxy(app: Express) {
-  app.get("/manus-storage/*", async (req, res) => {
-    const key = (req.params as Record<string, string>)[0];
+  app.get("/manus-storage/*path", async (req, res) => {
+    const key = routePathParameter((req.params as { path?: string | string[] }).path);
     if (!key) {
       res.status(400).send("Missing storage key");
       return;

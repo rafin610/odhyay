@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { PdfDocument } from "@/components/PdfDocument";
 import { readerPdfUrl } from "@/lib/pdfReader";
+import { loadReaderTheme, persistReaderTheme, type ReaderTheme } from "@/lib/readerTheme";
 import { BookGrid, Mark, PageFrame, SearchBar, SectionLabel } from "@/components/OdhyayShell";
 import { assets, type Book } from "@/lib/odhyayData";
 import { trpc } from "@/lib/trpc";
@@ -110,7 +111,7 @@ export function BookPersistentPage() {
   return <PageFrame><main className="container py-10 sm:py-14 lg:py-24"><Link href="/library" className="focus-ring inline-flex min-h-10 items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-[#a39aa9] hover:text-[#f3eee6]"><ArrowLeft size={15} /> Back to library</Link><div className="mt-8 grid gap-10 sm:mt-12 lg:grid-cols-[minmax(260px,420px)_1fr] lg:items-center lg:gap-24"><div className="mx-auto w-full max-w-[390px]"><div className="cover-frame aspect-[2/3] overflow-hidden cover-shadow"><div className="size-full overflow-hidden bg-[#24202a]"><img src={view.cover} alt={`${view.title} cover`} className="h-full w-full object-cover" /></div></div></div><div className="max-w-2xl"><p className="eyebrow text-amethyst">{view.category} · {view.pages} pages</p><h1 className="font-display mt-5 text-[clamp(3rem,7vw,6.7rem)] leading-[.92]">{view.title}</h1><p className="mt-5 text-lg text-[#c1b9c6] sm:mt-6">{view.author}</p><div className="my-7 h-px w-full bg-[#332d39] sm:my-8" /><p className="max-w-xl text-base leading-8 text-[#c0b7c4]">{view.description}</p><div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4 sm:mt-10"><Link href={`/read/${view.slug}`} className="focus-ring inline-flex min-h-11 items-center gap-3 bg-[#b7a4d7] px-5 py-3 text-xs font-bold uppercase tracking-[.15em] text-[#17121c]">Read now <ArrowRight size={15} /></Link><button onClick={() => favorite.mutate({ bookId: book.id })} disabled={favorite.isPending} className="focus-ring inline-flex min-h-11 items-center gap-2 text-xs font-bold uppercase tracking-[.13em] text-[#d1c8d5] hover:text-amethyst disabled:opacity-50"><Heart size={15} /> {favorite.isPending ? "Saving…" : isAuthenticated ? "Save to reading list" : "Sign in to save"}</button></div></div></div></main></PageFrame>;
 }
 
-function ReaderToolbar({ page, pages, zoom, theme, onPage, onZoom, onTheme, onBookmark }: { page: number; pages: number; zoom: number; theme: string; onPage: (page: number) => void; onZoom: (zoom: number) => void; onTheme: (theme: string) => void; onBookmark: () => void }) {
+function ReaderToolbar({ page, pages, zoom, theme, onPage, onZoom, onTheme, onBookmark }: { page: number; pages: number; zoom: number; theme: ReaderTheme; onPage: (page: number) => void; onZoom: (zoom: number) => void; onTheme: (theme: ReaderTheme) => void; onBookmark: () => void }) {
   return <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#3d3547] bg-[#17141c]/95 px-3 py-3 backdrop-blur-xl md:bottom-5 md:left-1/2 md:right-auto md:w-auto md:-translate-x-1/2 md:rounded-sm md:border"><div className="flex items-center justify-center gap-1 text-[#d7cedb]"><button className="focus-ring p-2 disabled:opacity-30" onClick={() => onPage(Math.max(1, page - 1))} disabled={page === 1}><ArrowLeft size={16} /></button><span className="mx-2 border-x border-[#3a3242] px-3 text-xs">{page} <span className="text-[#746c7d]">/ {pages}</span></span><button className="focus-ring p-2 disabled:opacity-30" onClick={() => onPage(Math.min(pages, page + 1))} disabled={page === pages}><ArrowRight size={16} /></button><button className="focus-ring hidden p-2 sm:block" onClick={() => onZoom(Math.max(.8, zoom - .1))}><Minus size={16} /></button><button className="focus-ring hidden p-2 sm:block" onClick={() => onZoom(Math.min(1.35, zoom + .1))}><Plus size={16} /></button><button className="focus-ring p-2" onClick={() => onTheme(theme === "dark" ? "daylight" : theme === "daylight" ? "sepia" : "dark")}><Sparkles size={16} /></button><button className="focus-ring hidden p-2 sm:block" onClick={() => document.documentElement.requestFullscreen?.()}><Expand size={16} /></button><button className="focus-ring hidden p-2 text-amethyst sm:block" onClick={onBookmark}><Bookmark size={16} /></button></div></div>;
 }
 
@@ -124,11 +125,11 @@ export function ReaderPersistentPage() {
   const [page, setPage] = useState(1);
   const [zoom, setZoom] = useState(1);
   const [pdfPages, setPdfPages] = useState(0);
-  const [theme, setTheme] = useState(() => localStorage.getItem("odhyay-reader-theme") || "dark");
+  const [theme, setTheme] = useState<ReaderTheme>(loadReaderTheme);
   const book = detail.data as RecordBook | undefined;
   const pdfUrl = book?.pdfKey ? readerPdfUrl(book.slug) : null;
 
-  useEffect(() => { localStorage.setItem("odhyay-reader-theme", theme); }, [theme]);
+  useEffect(() => { persistReaderTheme(theme); }, [theme]);
   useEffect(() => { setPdfPages(0); setPage(1); }, [book?.id, book?.pdfKey]);
   const pages = pdfPages || Math.max(1, book?.pageCount ?? 1);
   useEffect(() => { if (page > pages) setPage(pages); }, [page, pages]);

@@ -2,6 +2,7 @@ import type { Express, Request, Response } from "express";
 import { getBookBySlug } from "./db.js";
 import { storageGetSignedUrl } from "./storage.js";
 import { HttpError } from "../shared/_core/errors.js";
+import { firstRouteParameter } from "./_core/storageProxy.js";
 
 type ReaderPdfDependencies = {
   findBook: typeof getBookBySlug;
@@ -37,7 +38,9 @@ function readerPdfErrorStatus(error: unknown) {
 export function registerReaderPdfRoute(app: Express) {
   app.get("/api/reader/pdf/:slug", async (req: Request, res: Response) => {
     try {
-      const pdf = await loadReaderPdf(req.params.slug);
+      const slug = firstRouteParameter(req.params.slug);
+      if (!slug) throw new HttpError(404, "No PDF is attached to this book.");
+      const pdf = await loadReaderPdf(slug);
       res.set({
         "Cache-Control": "private, no-store",
         "Content-Type": pdf.mimeType,

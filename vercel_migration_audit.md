@@ -129,9 +129,18 @@ The Vercel function log conclusively identified two sequential Node ESM resoluti
 
 A direct regression test now reads every runtime module in the Vercel trace, rejects `@shared/*` aliases, and requires explicit `.js` suffixes for local imports. The repair passes the complete suite (**28 files / 45 tests**), TypeScript type checking, and the Vercel-specific frontend build. The next production deployment must still prove the function starts, serves `/api/trpc/library.list`, and can reach TiDB before broader browser-flow validation proceeds.
 
+## Vite SPA and API coexistence remediation
+
+The subsequent production check found the serverless API reachable but the site root returned Express’s `Cannot GET /`. Vercel’s current Express guide explains that `public/**` is CDN-served and `express.static()` is ignored, while the Vite guide requires an explicit SPA catch-all rewrite for deep links. The deployment was therefore reorganized to use Vite’s `public/` output as the CDN artifact and an `api/[...path].ts` function that exports the existing Express application.
+
+An initial Vite deployment served the SPA but produced a platform `404 NOT_FOUND` for `/api/trpc/*`. The final `vercel.json` declares the catch-all function, rewrites `/api/(.*)` to it, excludes API paths from the SPA fallback, and sends all other client routes to `index.html`. The production deployment at commit `8d2f054` is **Ready**. Direct production verification returned the TiDB-backed `AI for Student` catalog payload from `GET /api/trpc/library.list`, and the home page now renders its migrated book card and category data after the query settles. This resolves both the static root and API routing defects without removing the active Manus deployment.
+
 ## References
 
 [1]: https://docs.pingcap.com/tidbcloud/integrate-tidbcloud-with-vercel/ "Integrate TiDB Cloud with Vercel"
 [2]: https://vercel.com/docs/frameworks/backend/express "Express on Vercel"
 [3]: https://vercel.com/docs/vercel-blob/client-upload "Client Uploads with Vercel Blob"
 [4]: https://vercel.com/kb/guide/how-to-upload-and-store-files-with-vercel "How to upload and store files with Vercel"
+[5]: https://vercel.com/docs/frameworks/backend/express "Express on Vercel"
+[6]: https://vercel.com/docs/frameworks/frontend/vite "Vite on Vercel"
+[7]: https://vercel.com/docs/functions/runtimes/node-js "Using the Node.js Runtime with Vercel Functions"

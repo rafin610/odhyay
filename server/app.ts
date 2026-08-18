@@ -1,4 +1,5 @@
 import express from "express";
+import type { ErrorRequestHandler } from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerGoogleOAuthRoutes } from "./googleOAuth.js";
 import { registerCoverUploadRoute } from "./coverUpload.js";
@@ -9,6 +10,16 @@ import { registerOAuthRoutes } from "./_core/oauth.js";
 import { registerStorageProxy } from "./_core/storageProxy.js";
 import { appRouter } from "./routers.js";
 import { createContext } from "./_core/context.js";
+
+export const finalErrorHandler: ErrorRequestHandler = (error, _req, res, next) => {
+  if (res.headersSent) {
+    next(error);
+    return;
+  }
+
+  console.error("[Server] Unhandled request error", error);
+  res.status(500).json({ error: "The library could not complete this request. Please try again." });
+};
 
 export function createApp() {
   const app = express();
@@ -28,5 +39,6 @@ export function createApp() {
       createContext,
     }),
   );
+  app.use(finalErrorHandler);
   return app;
 }
