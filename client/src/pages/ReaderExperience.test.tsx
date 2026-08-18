@@ -88,4 +88,40 @@ describe("ReaderExperience", () => {
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(refetchBook).toHaveBeenCalledOnce();
   });
+
+  it("keeps a stable hook order while the book query transitions from loading to loaded", () => {
+    prepare(undefined, true);
+    const view = render(<ReaderExperience />);
+
+    prepare(book);
+    expect(() => view.rerender(<ReaderExperience />)).not.toThrow();
+    expect(screen.getByRole("heading", { name: "Reader Test" })).toBeInTheDocument();
+  });
+
+  it("keeps fullscreen entry accessible from the focused reader toolbar", () => {
+    prepare(book);
+    render(<ReaderExperience />);
+
+    expect(screen.getByRole("button", { name: "Enter full screen" })).toBeInTheDocument();
+  });
+
+  it("advances a page from a fullscreen wheel gesture", async () => {
+    let fullscreenElement: Element | null = null;
+    Object.defineProperty(document, "fullscreenElement", { configurable: true, get: () => fullscreenElement });
+    Object.defineProperty(HTMLElement.prototype, "requestFullscreen", {
+      configurable: true,
+      value: function requestFullscreen(this: HTMLElement) {
+        fullscreenElement = this;
+        document.dispatchEvent(new Event("fullscreenchange"));
+        return Promise.resolve();
+      },
+    });
+    prepare(book);
+    render(<ReaderExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Enter full screen" }));
+    fireEvent.wheel(screen.getByText(/Reading · Testing/), { deltaY: 80 });
+
+    expect(await screen.findByText("67% complete")).toBeInTheDocument();
+  });
 });

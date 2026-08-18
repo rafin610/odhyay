@@ -1,5 +1,7 @@
 # ODHYAY persistence work
 
+- [x] Add a fullscreen continuous-scroll reader mode that advances PDF pages with wheel, trackpad, and touch scrolling while preserving existing controls and progress persistence.
+
 - [x] Upgrade the static project to the supported full-stack template.
 - [x] Define persistent tables for books, authors, categories, reading progress, favorites, and bookmarks.
 - [x] Generate and apply the database migration without inserting test data.
