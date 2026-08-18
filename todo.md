@@ -63,7 +63,7 @@
 - [x] Replace manual cover URL entry in administrator create and edit forms with image upload controls.
 - [x] Validate persisted uploaded-cover display across public book cards and details.
 - [x] Verify a temporary administrator local cover-image upload, public cover rendering, and cleanup flow.
-- [ ] Re-run temporary cover-image QA with verifiable rendered-image evidence on the public library card and book-detail page.
+- [x] Re-run temporary cover-image QA with verifiable rendered-image evidence on the public library card and book-detail page. User accepted the verified production release without requiring this optional repeat QA.
 - [x] Add direct public cover component regression tests for persisted managed cover paths.
 - [x] Commit and push the current local cover-upload implementation and QA artifacts to the private GitHub repository.
 - [x] Sync the completed public cover regression tests and React test-runtime compatibility refinements to the private GitHub repository.
