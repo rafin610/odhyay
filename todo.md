@@ -83,12 +83,13 @@
 - [x] Add and pass direct regression coverage for TiDB public-endpoint TLS connection selection.
 - [x] Provision a dedicated Vercel Blob store and migrate existing managed cover/PDF objects before replacing legacy storage references.
 - [x] Configure Vercel project settings, deployment secrets, and Google OAuth callback URLs.
-- [ ] Deploy a preview and validate public browsing, Google sign-in, administrator access, uploads, PDF reading, and persistence.
-- [ ] Confirm the production Vercel release only after all critical flows pass, retaining the existing live deployment as rollback.
+- [x] Deploy a preview and validate public browsing, Google sign-in, administrator access, uploads, PDF reading, and persistence.
+- [x] Confirm the production Vercel release only after all critical flows pass, retaining the existing live deployment as rollback.
 - [x] Correct Blob-compatible PDF book validation to prevent Vercel tRPC startup failure.
 - [x] Add and run row-level source-versus-TiDB parity checks for identities, entity records, reading progress, bookmarks, foreign keys, and media references.
 - [x] Replace Vercel frontend Manus OAuth fallbacks with Google sign-in and isolate Manus-only callback behavior from the serverless runtime.
-- [ ] Visibly re-verify the saved Vercel callback URI under Google OAuth authorized redirect URIs before release validation.
+- [x] Visibly re-verify the saved Vercel callback URI under Google OAuth authorized redirect URIs before release validation.
+- [x] Diagnose and correct the live Vercel Google OAuth `redirect_uri_mismatch`, then verify administrator sign-in succeeds.
 - [x] Remove the data-seeding assumption from the administrator book-list regression test so it validates the current persisted catalog safely.
 - [x] Fix the Vercel serverless function bundle so it resolves the Express application and restores all `/api` routes in production.
 - [x] Change the Vercel project framework preset from static Vite to Express so the root server entrypoint receives `/api` traffic alongside generated public assets.
@@ -105,7 +106,9 @@
 - [x] Remove confirmed unused vulnerable runtime dependencies and re-run the production dependency audit.
 - [x] Replace legacy unnamed Express wildcard fallbacks with Express 5-compatible named wildcard routes.
 - [x] Reconcile schema expectations, TiDB persistence behavior, Blob media access, and public/admin API contracts.
-- [ ] Validate production API contracts beyond `library.list`, including auth state, reader PDF delivery, and administrator upload authorization.
-- [ ] Commit the production-readiness audit artifact and final repository-wide audit evidence before release checkpointing.
-- [ ] Validate visitor, authenticated-user, and administrator production journeys, including reader and media paths.
-- [ ] Record residual risks and verified outcomes in the Vercel migration audit before the final checkpoint.
+- [x] Validate production API contracts beyond `library.list`, including auth state, reader PDF delivery, and administrator upload authorization.
+- [x] Commit the production-readiness audit artifact and final repository-wide audit evidence before release checkpointing.
+- [x] Validate visitor, authenticated-user, and administrator production journeys, including reader and media paths.
+- [x] Verify the latest Vercel reader UI loads and renders the stored PDF in the browser.
+- [x] Validate a non-administrator authenticated user’s persisted reading action, or document the release limitation if no non-admin account is available.
+- [x] Record residual risks and verified outcomes in the Vercel migration audit before the final checkpoint.

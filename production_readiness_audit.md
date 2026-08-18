@@ -57,12 +57,18 @@ The production dependency audit initially reported **17 high**, **47 moderate**,
 | Vercel client build | `pnpm build:vercel` passed |
 | Production dependency audit | 0 known production vulnerabilities |
 | Local public API smoke test | `library.list` returned the persisted catalog |
+| Latest Vercel API contract smoke test | `library.list`, `auth.me`, reader PDF, and Blob capability returned `200`; an unauthenticated Blob-token request returned `403` |
+| Live Google OAuth repair | Added and saved `https://odhyay.vercel.app/api/auth/google/callback` under the ODHYAY Web client’s authorized redirect URIs; Google sign-in then opened the administrator workspace with the persisted book list |
+| Authenticated Blob upload authorization | In the signed-in administrator book form, a temporary JPEG cover selected from local storage completed with the UI state **Cover ready** / **Stored image**; no book record was submitted |
+| Browser reader validation | `/read/ai-for-student` rendered page 1 of 7 from the stored PDF in PDF.js, and the signed-in administrator received the **Bookmark saved** confirmation after saving a reader bookmark |
 
 ## 7. Residual items and release gate
 
 The current generated entry bundle remains about **625 kB minified** (about **188 kB gzip**), so further manual chunking remains a performance optimization rather than a functional blocker. The PDF worker is intentionally large and loaded as a separate asset. There is no evidence of fabricated reviews or testimonials in this project.
 
 Before declaring the Vercel migration accepted, the following operator-visible checks remain: complete Google login on the Vercel domain, confirm the administrator dashboard with the intended Google identity, verify a real uploaded cover and PDF, open the stored PDF in the reader, and confirm persistence after refresh. Google Cloud’s authorized callback list should also be visually rechecked for `https://odhyay.vercel.app/api/auth/google/callback`.
+
+**Account-coverage limitation.** This release validation used the authorized administrator account because no separate non-administrator Google test account was provided. The public visitor journey, authenticated bookmark persistence, reader flow, and admin authorization route were therefore verified, but a distinct non-admin browser session remains a recommended follow-up test rather than a release blocker.
 
 ## References
 

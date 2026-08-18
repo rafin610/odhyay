@@ -135,6 +135,14 @@ The subsequent production check found the serverless API reachable but the site 
 
 An initial Vite deployment served the SPA but produced a platform `404 NOT_FOUND` for `/api/trpc/*`. The final `vercel.json` declares the catch-all function, rewrites `/api/(.*)` to it, excludes API paths from the SPA fallback, and sends all other client routes to `index.html`. The production deployment at commit `8d2f054` is **Ready**. Direct production verification returned the TiDB-backed `AI for Student` catalog payload from `GET /api/trpc/library.list`, and the home page now renders its migrated book card and category data after the query settles. This resolves both the static root and API routing defects without removing the active Manus deployment.
 
+## Final production validation and release status
+
+The hardened Vercel release at commit `e7a3597` is **Ready**. It completed the Vite static SPA plus `/api/*` function deployment successfully after Node ESM import repair, Express 5 route compatibility changes, and dependency remediation. The final automated verification passed **32 Vitest files / 52 tests**, TypeScript checking, the Vercel client build, and `pnpm audit --prod` with no known production vulnerabilities.
+
+The production API contract checks returned `200` for the TiDB library catalog, unauthenticated `auth.me`, same-origin reader PDF stream, and Blob capability endpoint. An unauthenticated Blob-token request correctly returned `403`. Google’s OAuth error identified the missing exact callback URI; it was added and saved under the **ODHYAY Web** client as `https://odhyay.vercel.app/api/auth/google/callback`. The administrator then signed in successfully, opened the persisted book workspace, completed a temporary Blob-backed cover upload until the UI reported **Cover ready / Stored image**, and did not save a new book record.
+
+The public `AI for Student` reader rendered page 1 of 7 from the migrated PDF via PDF.js and persisted an authenticated bookmark. The original Manus site at `https://promptweb-mzwhxyal.manus.space` remains live as a rollback path. A separate non-administrator Google test account was not available; that exact account-role path remains a recommended follow-up, while all public, signed-in administrator, reader, upload, and persistence paths required for this release have been observed in production.
+
 ## References
 
 [1]: https://docs.pingcap.com/tidbcloud/integrate-tidbcloud-with-vercel/ "Integrate TiDB Cloud with Vercel"
