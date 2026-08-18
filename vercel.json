@@ -3,7 +3,16 @@
   "framework": "vite",
   "buildCommand": "pnpm build:vercel",
   "outputDirectory": "public",
+  "functions": {
+    "api/[...path].ts": {
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/[...path]"
+    },
     {
       "source": "/((?!api/).*)",
       "destination": "/index.html"

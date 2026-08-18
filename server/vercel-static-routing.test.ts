@@ -15,6 +15,15 @@ describe("Vercel Vite and API routing", () => {
 
     expect(config.framework).toBe("vite");
     expect(config.outputDirectory).toBe("public");
+    expect(config).toMatchObject({
+      functions: {
+        "api/[...path].ts": { maxDuration: 10 },
+      },
+    });
+    expect(config.rewrites).toContainEqual({
+      source: "/api/(.*)",
+      destination: "/api/[...path]",
+    });
     expect(config.rewrites).toContainEqual({
       source: "/((?!api/).*)",
       destination: "/index.html",
