@@ -96,3 +96,9 @@
 - [x] Diagnose and stabilize the persisted book-management integration test timeout observed during the Vercel-output verification run.
 - [x] Add explicit Node ESM import specifiers throughout the Vercel serverless application dependency graph and cover the rule with a direct regression test.
 - [x] Replace server-runtime TypeScript path aliases with deployable relative ESM imports after Vercel function logs identified an unresolved `@shared/const` module.
+- [ ] Produce a complete architecture, dependency, data-flow, and deployment map for the current ODHYAY implementation.
+- [ ] Resolve the Vercel static SPA delivery defect while preserving working serverless API routes.
+- [ ] Audit the repository for incomplete, dead, insecure, or production-risky code paths and correct confirmed defects.
+- [ ] Reconcile schema expectations, TiDB persistence behavior, Blob media access, and public/admin API contracts.
+- [ ] Validate visitor, authenticated-user, and administrator production journeys, including reader and media paths.
+- [ ] Record residual risks and verified outcomes in the Vercel migration audit before the final checkpoint.
