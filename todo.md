@@ -125,10 +125,10 @@
 - [x] Push and verify the light-mode enhancement on GitHub and Vercel production.
 - [x] Add an in-repository regression test proving manual global theme override persists through localStorage and applies the document theme attribute on a fresh render.
 - [x] Move the token contrast check into the repository and enforce it through the automated test workflow.
-- [ ] Verify deployed light mode on Vercel production across book detail, reader, and admin routes, including the separate reader paper-appearance control and global theme toggle.
+- [x] Defer complete production light-mode reader verification at the user’s request because no readable production book record is currently available.
 - [x] Verify on Vercel production that manual global theme overrides persist across route changes and reload after toggling from both navigation and reader toolbar. Navigation-originated override was verified directly; the reader toolbar is independently covered by regression tests because production currently has no readable book record.
-- [ ] Restore or publish a genuine production-readable book record so Vercel reader-toolbar validation can be completed without creating placeholder content.
-- [ ] Verify the production reader toolbar global toggle persists its override across a route change and reload while its separate paper-appearance control remains independent.
+- [x] Defer restoring a genuine production-readable book record; the user elected to review the remaining reader verification personally.
+- [x] Defer live production reader-toolbar override verification; the user elected to review the remaining reader verification personally.
 - [x] Audit button treatments, hover/press feedback, density, and mobile hierarchy across public, reader, and admin surfaces.
 - [x] Introduce a reusable premium button and interactive-control system with restrained motion and clear keyboard focus treatment.
 - [x] Refine the public catalog, reading experience, and admin workspace into a more composed minimal-premium visual hierarchy.
@@ -147,4 +147,4 @@
 - [x] Create a phone-first compact reader control layout while retaining an information-rich desktop toolbar.
 - [x] Preserve ODHAY reader paper appearance and global light/dark settings as distinct controls in the redesigned reader.
 - [x] Add rendered regression tests for page entry, zoom bounds, reader controls, focus handling, and mobile toolbar accessibility.
-- [ ] Verify and publish the reference-inspired ODHYAY reader upgrade on GitHub and Vercel production.
+- [x] Publish the reference-inspired ODHYAY reader upgrade on GitHub and Vercel production; defer direct live toolbar verification because no readable production book is available and the user elected to review it manually.
