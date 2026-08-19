@@ -134,9 +134,11 @@
 - [x] Refine the public catalog, reading experience, and admin workspace into a more composed minimal-premium visual hierarchy.
 - [x] Improve phone navigation, button sizing, spacing, and responsive content composition for one-handed use.
 - [x] Add regression coverage and validate desktop/mobile premium interactions, motion, and accessibility states.
-- [ ] Push and verify the premium UI refresh on GitHub and Vercel production.
+- [x] Push and verify the premium UI refresh on GitHub and Vercel production.
 - [x] Finish premium control migration across remaining admin dialogs, book actions, empty states, and access-management buttons.
 - [x] Add behavioral regression coverage for premium control application, mobile menu behavior, and interactive focus states across public, admin, and reader surfaces.
 - [x] Add render-based tests for premium public, reader, and administrator controls rather than source-class checks alone.
 - [x] Add focus accessibility and administrator action interaction coverage for key premium controls.
 - [x] Add a rendered administrator access-management action test that exercises premium actions and verifies keyboard focus behavior.
+- [x] Verify the deployed premium reader and administrator controls directly on Vercel production.
+- [x] Verify premium mobile navigation and primary actions on Vercel production at a phone-sized viewport.
