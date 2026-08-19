@@ -7,11 +7,17 @@ vi.mock("@/_core/hooks/useAuth", () => ({ useAuth: () => ({ user: null, loading:
 vi.mock("@/const", () => ({ startGoogleLogin: vi.fn() }));
 vi.mock("wouter", () => ({ Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => <a href={href} {...props}>{children}</a>, useLocation: () => ["/library", vi.fn()] }));
 
-import { Header } from "./OdhyayShell";
+import { Header, ODHYAY_LOGO_URL } from "./OdhyayShell";
 
 afterEach(cleanup);
 
 describe("ODHYAY responsive navigation", () => {
+  it("renders the supplied book-and-bookmark image as the shared brand mark", () => {
+    const { container } = render(<Header />);
+
+    expect(container.querySelector(`img[src="${ODHYAY_LOGO_URL}"]`)).toBeInTheDocument();
+  });
+
   it("opens a dedicated mobile navigation panel and supports Escape to close it", () => {
     render(<Header />);
     const toggle = screen.getByRole("button", { name: "Open navigation" });

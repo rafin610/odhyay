@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const { getBookBySlug, getProgress, saveProgress, addBookmark, refetchBook } = vi.hoisted(() => ({ getBookBySlug: vi.fn(), getProgress: vi.fn(), saveProgress: vi.fn(), addBookmark: vi.fn(), refetchBook: vi.fn() }));
 
 vi.mock("@/_core/hooks/useAuth", () => ({ useAuth: () => ({ isAuthenticated: true }) }));
-vi.mock("@/components/OdhyayShell", () => ({ PageFrame: ({ children }: { children: React.ReactNode }) => <div>{children}</div> }));
+vi.mock("@/components/OdhyayShell", () => ({ PageFrame: ({ children }: { children: React.ReactNode }) => <div>{children}</div>, Mark: () => <img data-testid="reader-brand-logo" alt="" /> }));
 vi.mock("@/components/ThemeToggle", () => ({ ThemeToggle: () => <button type="button" aria-label="Switch global theme">Global theme</button> }));
 vi.mock("@/components/ContinuousPdfReader", () => ({
   clampReaderProgress: (value: number | undefined) => Math.max(0, Math.min(100, Math.round(value ?? 0))),
@@ -50,6 +50,7 @@ describe("ReaderExperience", () => {
     expect(screen.queryByRole("button", { name: "Next page" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Fit pages to width" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Enter full screen" })).toBeInTheDocument();
+    expect(screen.getByTestId("reader-brand-logo")).toBeInTheDocument();
   });
 
   it("keeps direct zoom in, zoom out, and fit-width actions available for phone reader controls", () => {

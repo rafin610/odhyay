@@ -4,7 +4,7 @@ import { ArrowLeft, Bookmark, FileText, Maximize2, Minimize2, Minus, Plus, ScanL
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { ContinuousPdfReader, clampReaderProgress } from "@/components/ContinuousPdfReader";
-import { PageFrame } from "@/components/OdhyayShell";
+import { Mark, PageFrame } from "@/components/OdhyayShell";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { readerPdfUrl } from "@/lib/pdfReader";
 import { loadReaderTheme, persistReaderTheme, type ReaderTheme } from "@/lib/readerTheme";
@@ -147,7 +147,7 @@ export default function ReaderExperience() {
       <div className="reader-chrome-progress" aria-hidden="true"><span style={{ width: `${progress}%` }} /></div>
       <div className="reader-chrome-inner">
         <Link href={`/book/${book.slug}`} className="focus-ring reader-back-link" aria-label="Back to book details"><ArrowLeft size={17} /><span>Back</span></Link>
-        <div className="reader-book-identity"><span className="reader-book-title">{book.title}</span><span className="reader-book-progress" aria-live="polite">{progress}%</span></div>
+        <div className="reader-book-identity"><Mark small /><span className="reader-book-title">{book.title}</span><span className="reader-book-progress" aria-live="polite">{progress}%</span></div>
         <div className="reader-minimal-controls">
           <button type="button" className="focus-ring od-icon-button" onClick={() => setZoom(value => Math.max(.8, Number((value - .1).toFixed(1))))} disabled={zoom <= .8} aria-label="Zoom out" title="Zoom out"><Minus size={16} /></button>
           <button type="button" className="focus-ring reader-zoom-display" onClick={() => setZoom(1)} aria-label="Fit pages to width" title="Fit pages to width"><ScanLine size={16} /><span>{Math.round(zoom * 100)}%</span></button>

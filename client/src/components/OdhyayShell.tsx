@@ -7,8 +7,10 @@ import { startGoogleLogin } from "@/const";
 import { type Book } from "@/lib/odhyayData";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
+export const ODHYAY_LOGO_URL = "/manus-storage/odhyay-bookmark-logo_c9bf0234.png";
+
 export function Mark({ small = false }: { small?: boolean }) {
-  return <svg aria-hidden="true" viewBox="0 0 24 24" className={small ? "h-5 w-5" : "h-7 w-7"} fill="none"><path d="M4 17V7" stroke="var(--od-accent)" strokeWidth="2.5" strokeLinecap="round" /><path d="M9.3 17V4" stroke="var(--od-accent)" strokeWidth="2.5" strokeLinecap="round" /><path d="M14.7 17v-7" stroke="var(--od-accent)" strokeWidth="2.5" strokeLinecap="round" /><path d="M20 17V6" stroke="var(--od-accent)" strokeWidth="2.5" strokeLinecap="round" /></svg>;
+  return <img aria-hidden="true" src={ODHYAY_LOGO_URL} alt="" className={`${small ? "h-5 w-5" : "h-7 w-7"} shrink-0 rounded-[.28rem] object-cover shadow-sm`} />;
 }
 
 export function Logo() { return <Link href="/" className="focus-ring flex shrink-0 items-center gap-2.5" aria-label="ODHYAY home"><Mark /><span className="font-display text-[1.25rem] tracking-[.16em] sm:text-[1.35rem]">ODHYAY</span></Link>; }

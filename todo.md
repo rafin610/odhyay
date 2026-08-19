@@ -164,3 +164,6 @@
 - [x] Add mobile zoom regression coverage and verify the reader at a phone viewport.
 - [x] Restore vertical touch scrolling in the fullscreen phone PDF reader without breaking mobile zoom.
 - [x] Add fullscreen phone scroll regression coverage and visually verify the repaired gesture behavior.
+- [x] Prepare and host the supplied book-and-bookmark logo as a deployable web asset.
+- [x] Replace ODHYAY’s existing brand mark with the supplied logo in shared navigation, footer, and reader branding.
+- [x] Add logo rendering coverage, validate it on desktop and phone layouts, and publish the brand update.
