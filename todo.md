@@ -148,3 +148,8 @@
 - [x] Preserve ODHAY reader paper appearance and global light/dark settings as distinct controls in the redesigned reader.
 - [x] Add rendered regression tests for page entry, zoom bounds, reader controls, focus handling, and mobile toolbar accessibility.
 - [x] Publish the reference-inspired ODHYAY reader upgrade on GitHub and Vercel production; defer direct live toolbar verification because no readable production book is available and the user elected to review it manually.
+- [x] Audit and correct fullscreen reader layout so it fills the complete PC viewport or phone screen without surrounding reader chrome.
+- [x] Restrict normal reader mode to arrow-based page changes while retaining reader appearance controls separately.
+- [x] Make fullscreen wheel, trackpad, and vertical swipe gestures turn one PDF page at a time with smooth continuous-scroll semantics.
+- [x] Add regression tests for normal-mode arrow navigation, true fullscreen sizing, and fullscreen scroll/swipe page transitions.
+- [ ] Validate and publish the corrected fullscreen reader on GitHub and Vercel production.

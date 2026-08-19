@@ -71,7 +71,7 @@ describe("ReaderExperience", () => {
     expect(nextPage).toHaveClass("od-icon-button");
     nextPage.focus();
     expect(nextPage).toHaveFocus();
-    expect(screen.getByRole("textbox", { name: "Enter a page number" })).toHaveValue("1");
+    expect(screen.queryByRole("textbox", { name: "Enter a page number" })).not.toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "Change reading paper appearance" })[0]).toBeInTheDocument();
     fireEvent.click(screen.getAllByRole("button", { name: "Change reading paper appearance" })[0]);
     expect(screen.getByText("Daylight")).toBeInTheDocument();
@@ -124,21 +124,42 @@ describe("ReaderExperience", () => {
     render(<ReaderExperience />);
 
     fireEvent.click(screen.getAllByRole("button", { name: "Enter full screen" })[0]);
-    fireEvent.wheel(screen.getByText(/Reading · Testing/), { deltaY: 80 });
+    fireEvent.wheel(screen.getByText(/Reading · Testing/), { deltaY: 120 });
 
     expect(await screen.findByText("67% complete")).toBeInTheDocument();
   });
 
-  it("jumps to a bounded page through the direct page entry control", () => {
+  it("takes over the reader viewport and turns one page from a fullscreen swipe", async () => {
+    let fullscreenElement: Element | null = null;
+    Object.defineProperty(document, "fullscreenElement", { configurable: true, get: () => fullscreenElement });
+    Object.defineProperty(HTMLElement.prototype, "requestFullscreen", {
+      configurable: true,
+      value: function requestFullscreen(this: HTMLElement) {
+        fullscreenElement = this;
+        document.dispatchEvent(new Event("fullscreenchange"));
+        return Promise.resolve();
+      },
+    });
     prepare(book);
     render(<ReaderExperience />);
 
-    const pageEntry = screen.getByRole("textbox", { name: "Enter a page number" });
-    fireEvent.change(pageEntry, { target: { value: "3" } });
-    fireEvent.keyDown(pageEntry, { key: "Enter" });
+    fireEvent.click(screen.getByRole("button", { name: "Enter full screen" }));
+    const exit = await screen.findByRole("button", { name: "Exit full screen" });
+    expect(exit.closest(".reader-immersive")).not.toBeNull();
+    fireEvent.touchStart(screen.getByText(/Reading · Testing/), { touches: [{ clientY: 420 }] });
+    fireEvent.touchEnd(screen.getByText(/Reading · Testing/), { changedTouches: [{ clientY: 340 }] });
 
-    expect(screen.getByText("100% complete")).toBeInTheDocument();
-    expect(pageEntry).toHaveValue("3");
+    expect(await screen.findByText("67% complete")).toBeInTheDocument();
+  });
+
+  it("changes pages with arrow controls in normal reading mode", () => {
+    prepare(book);
+    render(<ReaderExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Next page" }));
+
+    expect(screen.getByText("67% complete")).toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: "Enter a page number" })).not.toBeInTheDocument();
   });
 
   it("keeps zoom within supported bounds and exposes compact reader utilities", () => {

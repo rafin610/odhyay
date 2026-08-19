@@ -48,6 +48,7 @@
 .reader-toolbar .od-icon-button:hover { color: var(--od-accent); background: color-mix(in srgb, var(--od-accent) 14%, transparent); }
 .reader-toolbar-layout { display: flex; align-items: center; justify-content: center; gap: .5rem; }
 .reader-page-controls, .reader-utilities { display: flex; align-items: center; gap: .2rem; }
+.reader-page-status { min-width: 5.75rem; border-inline: 1px solid color-mix(in srgb, currentColor 16%, transparent); padding-inline: .55rem; text-align: center; font-size: .72rem; font-variant-numeric: tabular-nums; }
 .reader-utilities { display: none !important; }
 .reader-page-entry { display: flex; min-width: 5.75rem; align-items: center; gap: .35rem; border-inline: 1px solid color-mix(in srgb, currentColor 16%, transparent); background: color-mix(in srgb, currentColor 4%, transparent); padding-inline: .55rem; font-size: .72rem; font-variant-numeric: tabular-nums; }
 .reader-page-entry input { width: 1.75rem; border: 0; background: transparent; color: var(--reader-ink); font: inherit; font-weight: 700; text-align: center; outline: none; }
@@ -58,6 +59,15 @@
 .reader-utility-drawer summary::-webkit-details-marker { display: none; }
 .reader-utility-panel { position: absolute; right: 0; bottom: calc(100% + .65rem); display: flex; align-items: center; gap: .15rem; min-width: max-content; border: 1px solid color-mix(in srgb, currentColor 18%, transparent); border-radius: .35rem; background: color-mix(in srgb, var(--reader-room) 92%, transparent); padding: .35rem; box-shadow: 0 16px 36px color-mix(in srgb, var(--reader-room) 52%, transparent); }
 @media (min-width: 768px) { .reader-utilities { display: flex !important; } .reader-utility-drawer { display: none !important; } }
+.reader-fullscreen-exit { position: absolute; z-index: 40; top: max(1rem, env(safe-area-inset-top)); right: max(1rem, env(safe-area-inset-right)); display: grid; width: 2.75rem; height: 2.75rem; place-items: center; border: 1px solid color-mix(in srgb, var(--reader-ink) 26%, transparent); border-radius: 999px; background: color-mix(in srgb, var(--reader-room) 72%, transparent); color: var(--reader-ink); opacity: .72; transition: opacity 160ms var(--ease-out), transform 160ms var(--ease-out); }
+.reader-fullscreen-exit:hover, .reader-fullscreen-exit:focus-visible { opacity: 1; transform: scale(1.04); }
+.reader-immersive { width: 100dvw; height: 100dvh; min-height: 100dvh; overflow: hidden; overscroll-behavior: none; touch-action: none; }
+.reader-immersive .reader-chrome { position: absolute; z-index: -1; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+.reader-immersive .reader-main { min-height: 100dvh; width: 100%; justify-content: center; padding: 0; }
+.reader-immersive .reader-session-meta { position: absolute; z-index: 20; top: max(1.1rem, env(safe-area-inset-top)); left: 1.2rem; right: 4.75rem; margin: 0; width: auto; max-width: none; color: var(--reader-ink); opacity: .68; pointer-events: none; }
+.reader-immersive .reader-paper { width: 100%; max-width: none; height: 100dvh; box-shadow: none; }
+.reader-pdf-immersive { min-height: 100dvh !important; height: 100dvh; padding: 0 !important; overflow: hidden !important; background: var(--reader-room); }
+.reader-pdf-immersive canvas { max-width: 100dvw; max-height: 100dvh; box-shadow: none; }
 .mobile-nav-drawer { box-shadow: 0 18px 36px color-mix(in srgb, var(--od-ink) 13%, transparent); }
 @media (max-width: 639px) { .eyebrow { font-size: .61rem; letter-spacing: .16em; } .od-button { min-height: 3rem; padding-inline: 1rem; } .od-hero { min-height: 580px; } .od-hero::after { background: linear-gradient(180deg, color-mix(in srgb, var(--od-hero) 18%, transparent), color-mix(in srgb, var(--od-hero) 64%, transparent) 52%, var(--od-hero) 100%); } .od-hero .hero-vignette { background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--od-hero) 60%, transparent)); } }
 @media (prefers-reduced-motion: no-preference) { .page-entrance { animation: page-enter .45s var(--ease-out) both; } .reveal { animation: reveal .55s var(--ease-out) both; } .reveal-delay-1 { animation-delay: 60ms; } .reveal-delay-2 { animation-delay: 120ms; } .reveal-delay-3 { animation-delay: 180ms; } .loading-shimmer { animation: shimmer 1.5s linear infinite; } @keyframes page-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } } @keyframes reveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } } @keyframes shimmer { to { background-position: -220% 0; } } }
