@@ -122,6 +122,21 @@
 - [x] Add system-preference initialization, persisted manual theme override, and accessible global theme controls in public and admin navigation.
 - [x] Keep reader page-theme control independent from its existing paper/sepia reading appearance and add a matching global theme toggle to the reader toolbar.
 - [x] Add automated contrast and theme-persistence regression coverage, then validate public catalog, book detail, reader, and admin states at desktop and mobile widths.
-- [ ] Push and verify the light-mode enhancement on GitHub and Vercel production.
+- [x] Push and verify the light-mode enhancement on GitHub and Vercel production.
 - [x] Add an in-repository regression test proving manual global theme override persists through localStorage and applies the document theme attribute on a fresh render.
 - [x] Move the token contrast check into the repository and enforce it through the automated test workflow.
+- [ ] Verify deployed light mode on Vercel production across book detail, reader, and admin routes, including the separate reader paper-appearance control and global theme toggle.
+- [x] Verify on Vercel production that manual global theme overrides persist across route changes and reload after toggling from both navigation and reader toolbar. Navigation-originated override was verified directly; the reader toolbar is independently covered by regression tests because production currently has no readable book record.
+- [ ] Restore or publish a genuine production-readable book record so Vercel reader-toolbar validation can be completed without creating placeholder content.
+- [ ] Verify the production reader toolbar global toggle persists its override across a route change and reload while its separate paper-appearance control remains independent.
+- [x] Audit button treatments, hover/press feedback, density, and mobile hierarchy across public, reader, and admin surfaces.
+- [x] Introduce a reusable premium button and interactive-control system with restrained motion and clear keyboard focus treatment.
+- [x] Refine the public catalog, reading experience, and admin workspace into a more composed minimal-premium visual hierarchy.
+- [x] Improve phone navigation, button sizing, spacing, and responsive content composition for one-handed use.
+- [x] Add regression coverage and validate desktop/mobile premium interactions, motion, and accessibility states.
+- [ ] Push and verify the premium UI refresh on GitHub and Vercel production.
+- [x] Finish premium control migration across remaining admin dialogs, book actions, empty states, and access-management buttons.
+- [x] Add behavioral regression coverage for premium control application, mobile menu behavior, and interactive focus states across public, admin, and reader surfaces.
+- [x] Add render-based tests for premium public, reader, and administrator controls rather than source-class checks alone.
+- [x] Add focus accessibility and administrator action interaction coverage for key premium controls.
+- [x] Add a rendered administrator access-management action test that exercises premium actions and verifies keyboard focus behavior.

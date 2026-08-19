@@ -15,6 +15,9 @@ describe("ODHYAY responsive navigation", () => {
   it("opens a dedicated mobile navigation panel and supports Escape to close it", () => {
     render(<Header />);
     const toggle = screen.getByRole("button", { name: "Open navigation" });
+    expect(toggle).toHaveClass("od-icon-button");
+    toggle.focus();
+    expect(toggle).toHaveFocus();
     fireEvent.click(toggle);
 
     const mobileNavigation = screen.getByRole("navigation", { name: "Mobile navigation" });
