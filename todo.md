@@ -159,4 +159,4 @@
 - [x] Add responsive phone, tablet, desktop, fullscreen, theme, and comfortable centered desktop reading-width behavior.
 - [x] Restore reader position on reopen and throttle/debounce persisted progress updates without creating a duplicate progress system.
 - [x] Add automated quality, continuous-scroll, virtualization, auto-resume, accessibility, and responsive regression coverage.
-- [ ] Validate and publish the high-quality continuous PDF reader upgrade on GitHub and Vercel production.
+- [x] Validate and publish the high-quality continuous PDF reader upgrade on GitHub and Vercel production.
