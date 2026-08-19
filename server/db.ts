@@ -122,7 +122,26 @@ export async function setManagedUserRole(openId: string, role: "admin" | "user")
   return Number(result[0].affectedRows) > 0;
 }
 
-export async function listCategories() { const db = await requireDb(); return db.select().from(categories).orderBy(categories.name); }
+/**
+ * Returns only categories that visitors can actually browse. Categories are
+ * created while a book draft is edited, so exposing the full table made stale
+ * drafts and QA-only labels appear as empty public shelves.
+ */
+export async function listCategories() {
+  const db = await requireDb();
+  return db
+    .select({
+      id: categories.id,
+      name: categories.name,
+      slug: categories.slug,
+      description: categories.description,
+      createdAt: categories.createdAt,
+    })
+    .from(categories)
+    .innerJoin(books, and(eq(books.categoryId, categories.id), eq(books.status, "published")))
+    .groupBy(categories.id, categories.name, categories.slug, categories.description, categories.createdAt)
+    .orderBy(categories.name);
+}
 
 export async function listBooks(input: { query?: string; categorySlug?: string; includeDrafts?: boolean } = {}) {
   const db = await requireDb();

@@ -57,7 +57,7 @@ export function Footer() {
 }
 
 export function PageFrame({ children, footer = true }: { children: React.ReactNode; footer?: boolean }) {
-  return <div className="min-h-screen bg-[#111015] text-[#f3eee6]"><Header /><div className="page-entrance">{children}</div>{footer && <Footer />}</div>;
+  return <div className="min-h-screen overflow-x-clip bg-[#111015] text-[#f3eee6]"><Header /><div className="page-entrance">{children}</div>{footer && <Footer />}</div>;
 }
 
 export function SectionLabel({ children, number }: { children: React.ReactNode; number?: string }) {

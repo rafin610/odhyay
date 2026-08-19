@@ -114,3 +114,6 @@
 - [x] Verify the latest Vercel reader UI loads and renders the stored PDF in the browser.
 - [x] Validate a non-administrator authenticated user’s persisted reading action, or document the release limitation if no non-admin account is available.
 - [x] Record residual risks and verified outcomes in the Vercel migration audit before the final checkpoint.
+- [x] Diagnose and correct the category-shelf data and responsive layout defect shown in the live library screenshot.
+- [ ] Push the category-shelf correction to GitHub and confirm the Vercel production deployment is ready.
+- [ ] Verify on Vercel production that only published-book categories are visible and the shelf has no horizontal overflow.
