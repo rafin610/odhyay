@@ -162,3 +162,5 @@
 - [x] Validate and publish the high-quality continuous PDF reader upgrade on GitHub and Vercel production.
 - [x] Add direct, touch-friendly zoom in, zoom out, and fit-width controls to the mobile continuous PDF reader.
 - [x] Add mobile zoom regression coverage and verify the reader at a phone viewport.
+- [x] Restore vertical touch scrolling in the fullscreen phone PDF reader without breaking mobile zoom.
+- [x] Add fullscreen phone scroll regression coverage and visually verify the repaired gesture behavior.

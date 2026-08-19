@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import React from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const { getBookBySlug, getProgress, saveProgress, addBookmark, refetchBook } = vi.hoisted(() => ({ getBookBySlug: vi.fn(), getProgress: vi.fn(), saveProgress: vi.fn(), addBookmark: vi.fn(), refetchBook: vi.fn() }));
@@ -10,7 +10,7 @@ vi.mock("@/components/OdhyayShell", () => ({ PageFrame: ({ children }: { childre
 vi.mock("@/components/ThemeToggle", () => ({ ThemeToggle: () => <button type="button" aria-label="Switch global theme">Global theme</button> }));
 vi.mock("@/components/ContinuousPdfReader", () => ({
   clampReaderProgress: (value: number | undefined) => Math.max(0, Math.min(100, Math.round(value ?? 0))),
-  ContinuousPdfReader: ({ url, initialPage, initialProgress, zoom, onVisiblePage, onProgress }: { url: string; initialPage: number; initialProgress: number; zoom: number; onVisiblePage: (page: number) => void; onProgress: (progress: number) => void }) => <div data-testid="continuous-pdf" data-url={url} data-initial-page={initialPage} data-initial-progress={initialProgress} data-zoom={zoom}><button type="button" onClick={() => onVisiblePage(2)}>Report page two</button><button type="button" onClick={() => onProgress(51)}>Report 51% progress</button></div>,
+  ContinuousPdfReader: ({ url, initialPage, initialProgress, zoom, scrollContainer, onVisiblePage, onProgress }: { url: string; initialPage: number; initialProgress: number; zoom: number; scrollContainer?: HTMLElement | null; onVisiblePage: (page: number) => void; onProgress: (progress: number) => void }) => <div data-testid="continuous-pdf" data-url={url} data-initial-page={initialPage} data-initial-progress={initialProgress} data-zoom={zoom} data-scroll-container={scrollContainer ? "reader-root" : "window"}><button type="button" onClick={() => onVisiblePage(2)}>Report page two</button><button type="button" onClick={() => onProgress(51)}>Report 51% progress</button></div>,
 }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
 vi.mock("wouter", () => ({ Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => <a href={href} {...props}>{children}</a>, useRoute: () => [true, { slug: "reader-test" }] }));
@@ -30,6 +30,7 @@ afterEach(() => {
   saveProgress.mockReset();
   addBookmark.mockReset();
   refetchBook.mockReset();
+  Object.defineProperty(document, "fullscreenElement", { configurable: true, value: null });
 });
 
 function prepare(data: TestBook | undefined, saved = { currentPage: 1, progressPercentage: 0 }, isLoading = false) {
@@ -62,6 +63,23 @@ describe("ReaderExperience", () => {
     fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
     fireEvent.click(screen.getByRole("button", { name: "Fit pages to width" }));
     expect(screen.getByTestId("continuous-pdf")).toHaveAttribute("data-zoom", "1");
+  });
+
+  it("routes fullscreen reading through the reader root so phone vertical scrolling stays available", async () => {
+    prepare(book);
+    Object.defineProperty(HTMLElement.prototype, "requestFullscreen", {
+      configurable: true,
+      value: function requestFullscreen(this: HTMLElement) {
+        Object.defineProperty(document, "fullscreenElement", { configurable: true, value: this });
+        document.dispatchEvent(new Event("fullscreenchange"));
+        return Promise.resolve();
+      },
+    });
+    render(<ReaderExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Enter full screen" }));
+    await waitFor(() => expect(screen.getByTestId("continuous-pdf")).toHaveAttribute("data-scroll-container", "reader-root"));
+    expect(document.querySelector(".reader-continuous-shell")).toHaveClass("reader-fullscreen");
   });
 
   it("restores saved current page and percentage before opening the document", () => {

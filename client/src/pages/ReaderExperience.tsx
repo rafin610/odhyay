@@ -161,7 +161,7 @@ export default function ReaderExperience() {
     </header>
     <main className="reader-continuous-main">
       <p className="reader-continuous-meta">{book.categoryName ?? "Other"} <span aria-hidden="true">·</span> Page {visiblePage}{pdfPages ? ` of ${pdfPages}` : ""}</p>
-      {readerIsRestoring ? <div className="reader-document-loading"><span className="loading-shimmer">Restoring your place…</span></div> : pdfUrl ? <ContinuousPdfReader key={`${book.id}-${resumePage}-${resumeProgress}`} url={pdfUrl} zoom={zoom} initialPage={resumePage} initialProgress={resumeProgress} onPageCount={setPdfPages} onVisiblePage={receiveVisiblePage} onProgress={receiveProgress} onLoadError={message => console.warn("[Reader]", message)} /> : <ReaderPreview book={book} readingTheme={readingTheme} page={visiblePage} onPage={receiveVisiblePage} />}
+      {readerIsRestoring ? <div className="reader-document-loading"><span className="loading-shimmer">Restoring your place…</span></div> : pdfUrl ? <ContinuousPdfReader key={`${book.id}-${resumePage}-${resumeProgress}`} url={pdfUrl} zoom={zoom} initialPage={resumePage} initialProgress={resumeProgress} scrollContainer={isFullscreen ? readerRef.current : null} onPageCount={setPdfPages} onVisiblePage={receiveVisiblePage} onProgress={receiveProgress} onLoadError={message => console.warn("[Reader]", message)} /> : <ReaderPreview book={book} readingTheme={readingTheme} page={visiblePage} onPage={receiveVisiblePage} />}
     </main>
   </div>;
 }

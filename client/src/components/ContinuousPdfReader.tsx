@@ -20,6 +20,7 @@ type ContinuousPdfReaderProps = {
   zoom: number;
   initialPage?: number;
   initialProgress?: number;
+  scrollContainer?: HTMLElement | null;
   onPageCount: (count: number) => void;
   onVisiblePage: (page: number) => void;
   onProgress: (percentage: number) => void;
@@ -108,7 +109,7 @@ function PdfCanvasPage({ pageNumber, pdf, metric, width, active, onError }: { pa
   </>;
 }
 
-export function ContinuousPdfReader({ url, zoom, initialPage = 1, initialProgress = 0, onPageCount, onVisiblePage, onProgress, onLoadError }: ContinuousPdfReaderProps) {
+export function ContinuousPdfReader({ url, zoom, initialPage = 1, initialProgress = 0, scrollContainer = null, onPageCount, onVisiblePage, onProgress, onLoadError }: ContinuousPdfReaderProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const pageElements = useRef(new Map<number, HTMLDivElement>());
   const activeByObserver = useRef(new Set<number>());
@@ -208,13 +209,15 @@ export function ContinuousPdfReader({ url, zoom, initialPage = 1, initialProgres
     frameId.current = null;
     const root = rootRef.current;
     if (!root || pageCount === 0) return;
-    const viewportLine = window.innerHeight * 0.34;
+    const viewportHeight = scrollContainer?.clientHeight || window.innerHeight;
+    const scrollRootTop = scrollContainer?.getBoundingClientRect().top || 0;
+    const viewportLine = viewportHeight * 0.34;
     let closestPage = 1;
     let closestDistance = Number.POSITIVE_INFINITY;
     pageElements.current.forEach((element, page) => {
       const rect = element.getBoundingClientRect();
-      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-      const distance = Math.abs(rect.top - viewportLine);
+      if (rect.bottom < scrollRootTop || rect.top > scrollRootTop + viewportHeight) return;
+      const distance = Math.abs(rect.top - (scrollRootTop + viewportLine));
       if (distance < closestDistance) {
         closestDistance = distance;
         closestPage = page;
@@ -223,11 +226,12 @@ export function ContinuousPdfReader({ url, zoom, initialPage = 1, initialProgres
     onVisiblePage(closestPage);
 
     const rect = root.getBoundingClientRect();
-    const readLine = window.scrollY + viewportLine;
-    const documentStart = window.scrollY + rect.top;
-    const readableDistance = Math.max(1, root.offsetHeight - window.innerHeight * 0.6);
+    const scrollTop = scrollContainer?.scrollTop ?? window.scrollY;
+    const readLine = scrollTop + viewportLine;
+    const documentStart = scrollTop + rect.top - scrollRootTop;
+    const readableDistance = Math.max(1, root.offsetHeight - viewportHeight * 0.6);
     onProgress(clampReaderProgress(((readLine - documentStart) / readableDistance) * 100));
-  }, [onProgress, onVisiblePage, pageCount]);
+  }, [onProgress, onVisiblePage, pageCount, scrollContainer]);
 
   const scheduleViewportUpdate = useCallback(() => {
     if (frameId.current !== null) return;
@@ -235,15 +239,16 @@ export function ContinuousPdfReader({ url, zoom, initialPage = 1, initialProgres
   }, [updateViewportState]);
 
   useEffect(() => {
-    window.addEventListener("scroll", scheduleViewportUpdate, { passive: true });
+    const scrollTarget: EventTarget = scrollContainer || window;
+    scrollTarget.addEventListener("scroll", scheduleViewportUpdate, { passive: true });
     window.addEventListener("resize", scheduleViewportUpdate);
     scheduleViewportUpdate();
     return () => {
-      window.removeEventListener("scroll", scheduleViewportUpdate);
+      scrollTarget.removeEventListener("scroll", scheduleViewportUpdate);
       window.removeEventListener("resize", scheduleViewportUpdate);
       if (frameId.current !== null) window.cancelAnimationFrame(frameId.current);
     };
-  }, [scheduleViewportUpdate]);
+  }, [scheduleViewportUpdate, scrollContainer]);
 
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined" || pageCount === 0) return;
@@ -258,10 +263,10 @@ export function ContinuousPdfReader({ url, zoom, initialPage = 1, initialProgres
       if (!next.size) next.add(1);
       setActivePages(current => samePageSet(current, next) ? current : next);
       scheduleViewportUpdate();
-    }, { rootMargin: PREFETCH_DISTANCE, threshold: 0.01 });
+    }, { root: scrollContainer || null, rootMargin: PREFETCH_DISTANCE, threshold: 0.01 });
     pageElements.current.forEach(element => observer.observe(element));
     return () => observer.disconnect();
-  }, [pageCount, scheduleViewportUpdate]);
+  }, [pageCount, scheduleViewportUpdate, scrollContainer]);
 
   useEffect(() => {
     if (hasRestoredPosition.current || pageCount === 0 || !rootRef.current) return;
@@ -270,14 +275,21 @@ export function ContinuousPdfReader({ url, zoom, initialPage = 1, initialProgres
       const root = rootRef.current;
       if (!root) return;
       const safeProgress = clampReaderProgress(initialProgress);
-      const top = window.scrollY + root.getBoundingClientRect().top;
-      const offset = Math.max(0, (root.offsetHeight - window.innerHeight * 0.6) * (safeProgress / 100));
-      if (safeProgress > 0) window.scrollTo({ top: Math.max(0, top + offset - window.innerHeight * 0.12), behavior: "auto" });
+      const viewportHeight = scrollContainer?.clientHeight || window.innerHeight;
+      const scrollRootTop = scrollContainer?.getBoundingClientRect().top || 0;
+      const currentScrollTop = scrollContainer?.scrollTop ?? window.scrollY;
+      const top = currentScrollTop + root.getBoundingClientRect().top - scrollRootTop;
+      const offset = Math.max(0, (root.offsetHeight - viewportHeight * 0.6) * (safeProgress / 100));
+      const targetTop = Math.max(0, top + offset - viewportHeight * 0.12);
+      if (safeProgress > 0) {
+        if (scrollContainer) scrollContainer.scrollTo({ top: targetTop, behavior: "auto" });
+        else window.scrollTo({ top: targetTop, behavior: "auto" });
+      }
       else pageElements.current.get(Math.max(1, Math.min(pageCount, initialPage)))?.scrollIntoView({ block: "start", behavior: "auto" });
       scheduleViewportUpdate();
     });
     return () => window.cancelAnimationFrame(restore);
-  }, [initialPage, initialProgress, pageCount, scheduleViewportUpdate]);
+  }, [initialPage, initialProgress, pageCount, scheduleViewportUpdate, scrollContainer]);
 
   if (error) {
     return <section role="alert" className="reader-document-error"><FileWarning size={28} /><p className="font-display text-2xl">This document could not open.</p><p>{readerPdfErrorMessage(error)}</p><button type="button" className="focus-ring od-button od-button-outline" onClick={() => setAttempt(value => value + 1)}><RefreshCw size={15} /> Try again</button><a className="focus-ring reader-open-original" href={url} target="_blank" rel="noreferrer">Open the original PDF</a></section>;

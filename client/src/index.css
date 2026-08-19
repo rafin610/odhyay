@@ -106,7 +106,7 @@
 .reader-document-error .od-button { color: var(--reader-ink); }
 .reader-open-original { color: var(--od-accent); font-size: .77rem; font-weight: 800; text-decoration: underline; text-underline-offset: .25rem; }
 .reader-preview-page { margin-top: .75rem; }
-.reader-fullscreen { width: 100dvw; min-height: 100dvh; }
-.reader-fullscreen .reader-continuous-main { min-height: calc(100dvh - 4.25rem); }
+.reader-fullscreen { width: 100dvw; height: 100dvh; min-height: 100dvh; overflow: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; }
+.reader-fullscreen .reader-continuous-main { min-height: calc(100dvh - 4.25rem); overflow: visible; }
 @media (max-width: 760px) { .reader-chrome-inner { gap: .35rem; padding-inline: .6rem; } .reader-back-link span, .reader-book-progress, .reader-zoom-display span, .reader-minimal-controls .od-theme-toggle, .reader-minimal-controls > :nth-child(6) { display: none; } .reader-minimal-controls { gap: 0; } .reader-minimal-controls .od-icon-button, .reader-zoom-display { width: 2.3rem; height: 2.3rem; } .reader-continuous-main { width: 100%; align-items: flex-start; overflow-x: auto; overscroll-behavior-x: contain; padding: .6rem 0 1.25rem; touch-action: pan-x pan-y; } .reader-continuous-meta { padding-inline: .75rem; margin-bottom: .55rem; } .reader-continuous-document { width: 100%; min-width: 100%; margin-inline: 0; gap: .45rem; } .reader-continuous-page { box-shadow: 0 9px 24px color-mix(in srgb, var(--reader-room) 34%, transparent); } .reader-page-number { opacity: .42; } }
 @media (prefers-reduced-motion: reduce) { .reader-continuous-chrome, .reader-chrome-progress span, .reader-page-number { transition: none; } }
