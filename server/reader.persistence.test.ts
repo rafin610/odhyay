@@ -24,8 +24,10 @@ describe("reader persistence", () => {
 
     const progress = await db.select().from(readingProgress).where(and(eq(readingProgress.userId, reader.id), eq(readingProgress.bookId, book.id))).limit(1);
     const savedBookmark = await db.select().from(bookmarks).where(and(eq(bookmarks.userId, reader.id), eq(bookmarks.bookId, book.id), eq(bookmarks.pageNumber, 2))).limit(1);
+    const restoredProgress = await caller.reader.getProgress({ bookId: book.id });
 
     expect(progress[0]).toMatchObject({ currentPage: 2, progressPercentage: 17 });
+    expect(restoredProgress).toMatchObject({ currentPage: 2, progressPercentage: 17 });
     expect(savedBookmark).toHaveLength(1);
   });
 });

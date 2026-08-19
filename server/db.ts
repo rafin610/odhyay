@@ -204,6 +204,12 @@ export async function deleteBook(id: number) {
   return Number(result[0].affectedRows) > 0;
 }
 
+export async function getReadingProgress(userId: number, bookId: number) {
+  const db = await requireDb();
+  const rows = await db.select({ currentPage: readingProgress.currentPage, progressPercentage: readingProgress.progressPercentage, updatedAt: readingProgress.updatedAt }).from(readingProgress).where(and(eq(readingProgress.userId, userId), eq(readingProgress.bookId, bookId))).limit(1);
+  return rows[0] ?? null;
+}
+
 export async function updateReadingProgress(userId: number, bookId: number, currentPage: number, progressPercentage: number) { const db = await requireDb(); await db.insert(readingProgress).values({ userId, bookId, currentPage, progressPercentage }).onDuplicateKeyUpdate({ set: { currentPage, progressPercentage, updatedAt: new Date() } }); }
 export async function toggleFavorite(userId: number, bookId: number) { const db = await requireDb(); const found = await db.select().from(favorites).where(and(eq(favorites.userId, userId), eq(favorites.bookId, bookId))).limit(1); if (found[0]) { await db.delete(favorites).where(eq(favorites.id, found[0].id)); return false; } await db.insert(favorites).values({ userId, bookId }); return true; }
 export async function addBookmark(userId: number, bookId: number, pageNumber: number) { const db = await requireDb(); await db.insert(bookmarks).values({ userId, bookId, pageNumber }).onDuplicateKeyUpdate({ set: { pageNumber } }); }

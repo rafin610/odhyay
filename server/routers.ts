@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { getSessionCookieOptions } from "./_core/cookies.js";
 import { systemRouter } from "./_core/systemRouter.js";
 import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc.js";
-import { addBookmark, createBook, deleteBook, getBookBySlug, listBooks, listCategories, listManagedUsers, setManagedUserRole, toggleFavorite, updateBook, updateReadingProgress } from "./db.js";
+import { addBookmark, createBook, deleteBook, getBookBySlug, getReadingProgress, listBooks, listCategories, listManagedUsers, setManagedUserRole, toggleFavorite, updateBook, updateReadingProgress } from "./db.js";
 
 const bookInput = z.object({
   title: z.string().trim().min(1).max(400),
@@ -36,6 +36,7 @@ export const appRouter = router({
     categories: publicProcedure.query(() => listCategories()),
   }),
   reader: router({
+    getProgress: protectedProcedure.input(z.object({ bookId: z.number().int().positive() })).query(async ({ ctx, input }) => getReadingProgress(ctx.user.id, input.bookId)),
     saveProgress: protectedProcedure.input(z.object({ bookId: z.number().int().positive(), currentPage: z.number().int().positive(), progressPercentage: z.number().int().min(0).max(100) })).mutation(async ({ ctx, input }) => {
       await updateReadingProgress(ctx.user.id, input.bookId, input.currentPage, input.progressPercentage);
       return { success: true } as const;
