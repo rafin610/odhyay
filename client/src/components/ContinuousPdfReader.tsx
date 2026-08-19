@@ -123,7 +123,8 @@ export function ContinuousPdfReader({ url, zoom, initialPage = 1, initialProgres
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const maxViewportWidth = Math.max(260, Math.floor(window.innerWidth - 24));
-  const targetColumnWidth = Math.min(Math.round(760 * zoom), maxViewportWidth);
+  const fitWidth = Math.min(760, maxViewportWidth);
+  const targetColumnWidth = Math.round(fitWidth * zoom);
   const pageWidth = Math.max(260, containerWidth || targetColumnWidth);
 
   const setPageElement = useCallback((page: number, element: HTMLDivElement | null) => {

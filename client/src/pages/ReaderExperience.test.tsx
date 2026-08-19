@@ -51,6 +51,19 @@ describe("ReaderExperience", () => {
     expect(screen.getByRole("button", { name: "Enter full screen" })).toBeInTheDocument();
   });
 
+  it("keeps direct zoom in, zoom out, and fit-width actions available for phone reader controls", () => {
+    prepare(book);
+    render(<ReaderExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    expect(screen.getByTestId("continuous-pdf")).toHaveAttribute("data-zoom", "1.1");
+    fireEvent.click(screen.getByRole("button", { name: "Zoom out" }));
+    expect(screen.getByTestId("continuous-pdf")).toHaveAttribute("data-zoom", "1");
+    fireEvent.click(screen.getByRole("button", { name: "Zoom in" }));
+    fireEvent.click(screen.getByRole("button", { name: "Fit pages to width" }));
+    expect(screen.getByTestId("continuous-pdf")).toHaveAttribute("data-zoom", "1");
+  });
+
   it("restores saved current page and percentage before opening the document", () => {
     prepare(book, { currentPage: 3, progressPercentage: 64 });
     render(<ReaderExperience />);
