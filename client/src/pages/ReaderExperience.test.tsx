@@ -71,8 +71,9 @@ describe("ReaderExperience", () => {
     expect(nextPage).toHaveClass("od-icon-button");
     nextPage.focus();
     expect(nextPage).toHaveFocus();
-    expect(screen.getByRole("button", { name: "Change reading paper appearance" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Change reading paper appearance" }));
+    expect(screen.getByRole("textbox", { name: "Enter a page number" })).toHaveValue("1");
+    expect(screen.getAllByRole("button", { name: "Change reading paper appearance" })[0]).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole("button", { name: "Change reading paper appearance" })[0]);
     expect(screen.getByText("Daylight")).toBeInTheDocument();
   });
 
@@ -105,7 +106,7 @@ describe("ReaderExperience", () => {
     prepare(book);
     render(<ReaderExperience />);
 
-    expect(screen.getByRole("button", { name: "Enter full screen" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Enter full screen" })[0]).toBeInTheDocument();
   });
 
   it("advances a page from a fullscreen wheel gesture", async () => {
@@ -122,9 +123,34 @@ describe("ReaderExperience", () => {
     prepare(book);
     render(<ReaderExperience />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Enter full screen" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Enter full screen" })[0]);
     fireEvent.wheel(screen.getByText(/Reading · Testing/), { deltaY: 80 });
 
     expect(await screen.findByText("67% complete")).toBeInTheDocument();
+  });
+
+  it("jumps to a bounded page through the direct page entry control", () => {
+    prepare(book);
+    render(<ReaderExperience />);
+
+    const pageEntry = screen.getByRole("textbox", { name: "Enter a page number" });
+    fireEvent.change(pageEntry, { target: { value: "3" } });
+    fireEvent.keyDown(pageEntry, { key: "Enter" });
+
+    expect(screen.getByText("100% complete")).toBeInTheDocument();
+    expect(pageEntry).toHaveValue("3");
+  });
+
+  it("keeps zoom within supported bounds and exposes compact reader utilities", () => {
+    prepare(book);
+    render(<ReaderExperience />);
+
+    const zoomIn = screen.getAllByRole("button", { name: "Zoom in" })[0];
+    fireEvent.click(zoomIn);
+    expect(screen.getAllByLabelText("Zoom 110 percent")).not.toHaveLength(0);
+    const utilityDrawer = screen.getByLabelText("Open reader controls");
+    expect(utilityDrawer).toHaveClass("od-icon-button");
+    utilityDrawer.focus();
+    expect(utilityDrawer).toHaveFocus();
   });
 });

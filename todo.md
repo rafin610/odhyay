@@ -142,3 +142,9 @@
 - [x] Add a rendered administrator access-management action test that exercises premium actions and verifies keyboard focus behavior.
 - [x] Verify the deployed premium reader and administrator controls directly on Vercel production.
 - [x] Verify premium mobile navigation and primary actions on Vercel production at a phone-sized viewport.
+- [x] Document the reference PDF reader’s zoom, direct page entry, previous/next, fullscreen, and progress conventions for ODHYAY adaptation.
+- [x] Add an adaptive reader control system with direct page entry, bounded zoom, page navigation, fullscreen, and readable progress feedback.
+- [x] Create a phone-first compact reader control layout while retaining an information-rich desktop toolbar.
+- [x] Preserve ODHAY reader paper appearance and global light/dark settings as distinct controls in the redesigned reader.
+- [x] Add rendered regression tests for page entry, zoom bounds, reader controls, focus handling, and mobile toolbar accessibility.
+- [ ] Verify and publish the reference-inspired ODHYAY reader upgrade on GitHub and Vercel production.

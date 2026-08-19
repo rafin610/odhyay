@@ -46,6 +46,18 @@
 .reader-toolbar { box-shadow: 0 16px 42px color-mix(in srgb, var(--reader-room) 52%, transparent); }
 .reader-toolbar .od-icon-button { color: inherit; }
 .reader-toolbar .od-icon-button:hover { color: var(--od-accent); background: color-mix(in srgb, var(--od-accent) 14%, transparent); }
+.reader-toolbar-layout { display: flex; align-items: center; justify-content: center; gap: .5rem; }
+.reader-page-controls, .reader-utilities { display: flex; align-items: center; gap: .2rem; }
+.reader-utilities { display: none !important; }
+.reader-page-entry { display: flex; min-width: 5.75rem; align-items: center; gap: .35rem; border-inline: 1px solid color-mix(in srgb, currentColor 16%, transparent); background: color-mix(in srgb, currentColor 4%, transparent); padding-inline: .55rem; font-size: .72rem; font-variant-numeric: tabular-nums; }
+.reader-page-entry input { width: 1.75rem; border: 0; background: transparent; color: var(--reader-ink); font: inherit; font-weight: 700; text-align: center; outline: none; }
+.reader-page-entry input:focus-visible { color: var(--od-accent); box-shadow: 0 2px 0 var(--od-accent); }
+.reader-zoom-status { min-width: 2.6rem; text-align: center; font-size: .66rem; font-variant-numeric: tabular-nums; opacity: .72; }
+.reader-utility-drawer { position: relative; }
+.reader-utility-drawer summary { list-style: none; cursor: pointer; }
+.reader-utility-drawer summary::-webkit-details-marker { display: none; }
+.reader-utility-panel { position: absolute; right: 0; bottom: calc(100% + .65rem); display: flex; align-items: center; gap: .15rem; min-width: max-content; border: 1px solid color-mix(in srgb, currentColor 18%, transparent); border-radius: .35rem; background: color-mix(in srgb, var(--reader-room) 92%, transparent); padding: .35rem; box-shadow: 0 16px 36px color-mix(in srgb, var(--reader-room) 52%, transparent); }
+@media (min-width: 768px) { .reader-utilities { display: flex !important; } .reader-utility-drawer { display: none !important; } }
 .mobile-nav-drawer { box-shadow: 0 18px 36px color-mix(in srgb, var(--od-ink) 13%, transparent); }
 @media (max-width: 639px) { .eyebrow { font-size: .61rem; letter-spacing: .16em; } .od-button { min-height: 3rem; padding-inline: 1rem; } .od-hero { min-height: 580px; } .od-hero::after { background: linear-gradient(180deg, color-mix(in srgb, var(--od-hero) 18%, transparent), color-mix(in srgb, var(--od-hero) 64%, transparent) 52%, var(--od-hero) 100%); } .od-hero .hero-vignette { background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--od-hero) 60%, transparent)); } }
 @media (prefers-reduced-motion: no-preference) { .page-entrance { animation: page-enter .45s var(--ease-out) both; } .reveal { animation: reveal .55s var(--ease-out) both; } .reveal-delay-1 { animation-delay: 60ms; } .reveal-delay-2 { animation-delay: 120ms; } .reveal-delay-3 { animation-delay: 180ms; } .loading-shimmer { animation: shimmer 1.5s linear infinite; } @keyframes page-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } } @keyframes reveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } } @keyframes shimmer { to { background-position: -220% 0; } } }
