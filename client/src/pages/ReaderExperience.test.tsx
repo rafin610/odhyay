@@ -68,8 +68,8 @@ describe("ReaderExperience", () => {
     expect(screen.getByText("Document preview")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Previous page" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Next page" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Change reading theme" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Change reading theme" }));
+    expect(screen.getByRole("button", { name: "Change reading paper appearance" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Change reading paper appearance" }));
     expect(screen.getByText("Daylight")).toBeInTheDocument();
   });
 

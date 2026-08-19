@@ -1,2 +1,27 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" /><meta name="theme-color" content="#111015" /><meta name="description" content="ODHYAY — a calm digital library for curious minds." /><meta property="og:title" content="ODHYAY — A calm place to read" /><meta property="og:description" content="Find the next page worth your time." /><title>ODHYAY — A calm place to read</title></head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script><script defer src="%VITE_ANALYTICS_ENDPOINT%/umami" data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script></body></html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="theme-color" content="#f7f3ec" />
+    <meta name="description" content="ODHYAY — a calm digital library for curious minds." />
+    <meta property="og:title" content="ODHYAY — A calm place to read" />
+    <meta property="og:description" content="Find the next page worth your time." />
+    <script>
+      (() => {
+        try {
+          const stored = localStorage.getItem("odhyay-color-theme");
+          const theme = stored === "light" || stored === "dark" ? stored : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.style.colorScheme = theme;
+        } catch { document.documentElement.dataset.theme = "light"; }
+      })();
+    </script>
+    <title>ODHYAY — A calm place to read</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script defer src="%VITE_ANALYTICS_ENDPOINT%/umami" data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
+  </body>
+</html>

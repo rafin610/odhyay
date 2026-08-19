@@ -117,3 +117,11 @@
 - [x] Diagnose and correct the category-shelf data and responsive layout defect shown in the live library screenshot.
 - [x] Push the category-shelf correction to GitHub and confirm the Vercel production deployment is ready.
 - [x] Verify on Vercel production that only published-book categories are visible and the shelf has no horizontal overflow.
+- [x] Audit current global, public, admin, and reader theme styling plus existing reader-specific appearance controls.
+- [x] Replace ODHYAY color literals with semantic CSS tokens for dark and warm-paper light themes.
+- [x] Add system-preference initialization, persisted manual theme override, and accessible global theme controls in public and admin navigation.
+- [x] Keep reader page-theme control independent from its existing paper/sepia reading appearance and add a matching global theme toggle to the reader toolbar.
+- [x] Add automated contrast and theme-persistence regression coverage, then validate public catalog, book detail, reader, and admin states at desktop and mobile widths.
+- [ ] Push and verify the light-mode enhancement on GitHub and Vercel production.
+- [x] Add an in-repository regression test proving manual global theme override persists through localStorage and applies the document theme attribute on a fresh render.
+- [x] Move the token contrast check into the repository and enforce it through the automated test workflow.
