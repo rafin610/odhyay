@@ -152,4 +152,4 @@
 - [x] Restrict normal reader mode to arrow-based page changes while retaining reader appearance controls separately.
 - [x] Make fullscreen wheel, trackpad, and vertical swipe gestures turn one PDF page at a time with smooth continuous-scroll semantics.
 - [x] Add regression tests for normal-mode arrow navigation, true fullscreen sizing, and fullscreen scroll/swipe page transitions.
-- [ ] Validate and publish the corrected fullscreen reader on GitHub and Vercel production.
+- [x] Validate and publish the corrected fullscreen reader on GitHub and Vercel production.
