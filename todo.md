@@ -167,3 +167,5 @@
 - [x] Prepare and host the supplied book-and-bookmark logo as a deployable web asset.
 - [x] Replace ODHYAY’s existing brand mark with the supplied logo in shared navigation, footer, and reader branding.
 - [x] Add logo rendering coverage, validate it on desktop and phone layouts, and publish the brand update.
+- [x] Diagnose and repair the broken deployed logo asset reference across ODHYAY branding surfaces.
+- [ ] Verify the repaired logo on the live site and responsive reader/header layouts.

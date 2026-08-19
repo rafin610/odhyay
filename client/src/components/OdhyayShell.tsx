@@ -7,7 +7,7 @@ import { startGoogleLogin } from "@/const";
 import { type Book } from "@/lib/odhyayData";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-export const ODHYAY_LOGO_URL = "/manus-storage/odhyay-bookmark-logo_c9bf0234.png";
+export const ODHYAY_LOGO_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310419663030973859/TkJFcQVIhnmmxhdI.png";
 
 export function Mark({ small = false }: { small?: boolean }) {
   return <img aria-hidden="true" src={ODHYAY_LOGO_URL} alt="" className={`${small ? "h-5 w-5" : "h-7 w-7"} shrink-0 rounded-[.28rem] object-cover shadow-sm`} />;
