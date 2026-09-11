@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { readerPdfUrl } from "@/lib/pdfReader";
 import { loadReaderTheme, persistReaderTheme, type ReaderTheme } from "@/lib/readerTheme";
 import { trpc } from "@/lib/trpc";
+import { startGoogleLogin } from "@/const";
 
 type RecordBook = { id: number; title: string; slug: string; description: string; coverUrl: string | null; pdfKey: string | null; pdfFilename: string | null; pdfMimeType: string | null; pdfSize: number | null; pageCount: number; authorName: string; categoryName: string | null };
 const readerThemes: Record<ReaderTheme, { label: string; room: string }> = { dark: { label: "Night", room: "reader-room-night" }, daylight: { label: "Daylight", room: "reader-room-daylight" }, sepia: { label: "Sepia", room: "reader-room-sepia" } };
@@ -17,6 +18,11 @@ const PROGRESS_DEBOUNCE_MS = 650;
 function ReaderFallback({ loading, onRetry }: { loading: boolean; onRetry: () => void }) {
   if (loading) return <PageFrame><main className="container py-24"><div role="status" className="loading-shimmer border hairline od-surface px-6 py-14"><p className="eyebrow od-accent">Reading room</p><p className="mt-5 text-sm od-muted">Opening your book…</p></div></main></PageFrame>;
   return <PageFrame><main className="container py-24"><div role="alert" className="border od-border-strong od-surface px-6 py-12 text-center"><p className="font-display text-3xl od-ink">This reading room is unavailable.</p><p className="mx-auto mt-3 max-w-md text-sm leading-7 od-muted">Please refresh the book details and try again.</p><button onClick={onRetry} className="focus-ring od-button od-button-outline mt-7">Try again</button></div></main></PageFrame>;
+}
+
+function ReaderLoginGate({ slug }: { slug: string }) {
+  const login = () => startGoogleLogin(`${window.location.origin}/read/${slug}`);
+  return <PageFrame><main className="container flex min-h-[70vh] items-center justify-center py-24"><section className="max-w-lg border hairline od-surface px-7 py-12 text-center sm:px-12"><Mark /><p className="eyebrow mt-7 od-accent">Members’ reading room</p><h1 className="font-display mt-4 text-4xl leading-tight sm:text-5xl">Sign in to read.</h1><p className="mx-auto mt-5 max-w-md text-sm leading-7 od-muted">Please sign in before opening a book. Your reading progress and bookmarks will stay connected to your account.</p><button type="button" onClick={login} className="focus-ring od-button od-button-primary mt-8">Continue with Google</button><Link href={`/book/${slug}`} className="focus-ring mt-6 block text-xs font-bold uppercase tracking-[.16em] od-muted hover:text-amethyst">Back to book details</Link></section></main></PageFrame>;
 }
 
 function ReaderPreview({ book, readingTheme, page, onPage }: { book: RecordBook; readingTheme: ReaderTheme; page: number; onPage: (page: number) => void }) {
@@ -29,7 +35,7 @@ export default function ReaderExperience() {
   const bookQueryInput = useMemo(() => ({ slug: slug ?? "route-pending" }), [slug]);
   const bookQueryOptions = useMemo(() => ({ enabled: Boolean(slug) }), [slug]);
   const detail = trpc.library.getBySlug.useQuery(bookQueryInput, bookQueryOptions);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const book = detail.data as RecordBook | undefined;
   const progressQueryInput = useMemo(() => ({ bookId: book?.id ?? 0 }), [book?.id]);
   const progressQueryOptions = useMemo(() => ({ enabled: Boolean(book && isAuthenticated) }), [book, isAuthenticated]);
@@ -131,6 +137,8 @@ export default function ReaderExperience() {
   }, []);
 
   if (!slug || !book) return <ReaderFallback loading={detail.isLoading} onRetry={() => void detail.refetch()} />;
+  if (loading) return <ReaderFallback loading onRetry={() => void detail.refetch()} />;
+  if (!isAuthenticated) return <ReaderLoginGate slug={book.slug} />;
 
   const cycleReadingTheme = () => setReadingTheme(current => current === "dark" ? "daylight" : current === "daylight" ? "sepia" : "dark");
   const bookmark = () => {
@@ -140,7 +148,7 @@ export default function ReaderExperience() {
     }
     saveBookmark.mutate({ bookId: book.id, pageNumber: Math.max(1, visiblePage) });
   };
-  const readerIsRestoring = Boolean(pdfUrl && isAuthenticated && progressQuery.isLoading);
+  const readerIsRestoring = Boolean(pdfUrl && progressQuery.isLoading);
 
   return <div ref={readerRef} className={`reader-shell reader-continuous-shell min-h-screen ${activeTheme.room} ${isFullscreen ? "reader-fullscreen" : ""}`}>
     <header className={`reader-chrome reader-continuous-chrome ${chromeHidden ? "reader-chrome-hidden" : ""}`}>

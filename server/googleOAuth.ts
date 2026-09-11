@@ -12,7 +12,7 @@ const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
 
-type GoogleState = { nonce: string; redirectUri: string };
+type GoogleState = { nonce: string; redirectUri: string; returnPath?: string };
 type GoogleToken = { access_token?: string; error?: string; error_description?: string };
 export type GoogleProfile = { sub?: string; email?: string; name?: string };
 
@@ -46,6 +46,17 @@ export function googleIdentityFromProfile(profile: GoogleProfile) {
   const email = normalizedProfileText(profile.email);
   const name = normalizedProfileText(profile.name) ?? email ?? "Google reader";
   return { openId: `google:${subject}`, name, email: email ?? null, loginMethod: "google" as const };
+}
+
+export function validatedReturnPath(value: string | undefined, origin: string) {
+  if (!value) return "/";
+  try {
+    const parsed = new URL(value, origin);
+    if (parsed.origin !== origin || !parsed.pathname.startsWith("/") || parsed.pathname.startsWith("/api/")) return "/";
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch {
+    return "/";
+  }
 }
 
 function encodeState(value: GoogleState) {
@@ -84,8 +95,9 @@ export function registerGoogleOAuthRoutes(app: Express) {
       return;
     }
     const redirectUri = `${origin}/api/auth/google/callback`;
+    const returnPath = validatedReturnPath(typeof req.query.returnTo === "string" ? req.query.returnTo : undefined, origin);
     const nonce = randomBytes(32).toString("base64url");
-    res.cookie(GOOGLE_STATE_COOKIE, encodeState({ nonce, redirectUri }), { ...getSessionCookieOptions(req), httpOnly: true, maxAge: 10 * 60 * 1000 });
+    res.cookie(GOOGLE_STATE_COOKIE, encodeState({ nonce, redirectUri, returnPath }), { ...getSessionCookieOptions(req), httpOnly: true, maxAge: 10 * 60 * 1000 });
 
     const authUrl = new URL(GOOGLE_AUTH_URL);
     authUrl.searchParams.set("client_id", ENV.googleClientId);
@@ -131,7 +143,7 @@ export function registerGoogleOAuthRoutes(app: Express) {
       await db.upsertUser({ ...identity, lastSignedIn: new Date() });
       const sessionToken = await sdk.createSessionToken(identity.openId, { name: identity.name, expiresInMs: ONE_YEAR_MS });
       res.cookie(COOKIE_NAME, sessionToken, { ...getSessionCookieOptions(req), maxAge: ONE_YEAR_MS });
-      res.redirect(302, "/");
+      res.redirect(302, saved.returnPath ?? "/");
     } catch (error) {
       console.error("[Google OAuth] Callback failed", error);
       res.status(500).send("Google sign-in could not be completed. Please try again.");

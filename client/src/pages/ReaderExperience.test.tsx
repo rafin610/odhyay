@@ -3,10 +3,11 @@ import React from "react";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const { getBookBySlug, getProgress, saveProgress, addBookmark, refetchBook } = vi.hoisted(() => ({ getBookBySlug: vi.fn(), getProgress: vi.fn(), saveProgress: vi.fn(), addBookmark: vi.fn(), refetchBook: vi.fn() }));
+const { getBookBySlug, getProgress, saveProgress, addBookmark, refetchBook, authState, startGoogleLogin } = vi.hoisted(() => ({ getBookBySlug: vi.fn(), getProgress: vi.fn(), saveProgress: vi.fn(), addBookmark: vi.fn(), refetchBook: vi.fn(), authState: { isAuthenticated: true, loading: false }, startGoogleLogin: vi.fn() }));
 
-vi.mock("@/_core/hooks/useAuth", () => ({ useAuth: () => ({ isAuthenticated: true }) }));
+vi.mock("@/_core/hooks/useAuth", () => ({ useAuth: () => authState }));
 vi.mock("@/components/OdhyayShell", () => ({ PageFrame: ({ children }: { children: React.ReactNode }) => <div>{children}</div>, Mark: () => <img data-testid="reader-brand-logo" alt="" /> }));
+vi.mock("@/const", () => ({ startGoogleLogin }));
 vi.mock("@/components/ThemeToggle", () => ({ ThemeToggle: () => <button type="button" aria-label="Switch global theme">Global theme</button> }));
 vi.mock("@/components/ContinuousPdfReader", () => ({
   clampReaderProgress: (value: number | undefined) => Math.max(0, Math.min(100, Math.round(value ?? 0))),
@@ -30,6 +31,9 @@ afterEach(() => {
   saveProgress.mockReset();
   addBookmark.mockReset();
   refetchBook.mockReset();
+  startGoogleLogin.mockReset();
+  authState.isAuthenticated = true;
+  authState.loading = false;
   Object.defineProperty(document, "fullscreenElement", { configurable: true, value: null });
 });
 
@@ -41,6 +45,17 @@ function prepare(data: TestBook | undefined, saved = { currentPage: 1, progressP
 }
 
 describe("ReaderExperience", () => {
+  it("requires login before opening a book reader", () => {
+    prepare(book);
+    authState.isAuthenticated = false;
+    render(<ReaderExperience />);
+
+    expect(screen.getByRole("heading", { name: "Sign in to read." })).toBeInTheDocument();
+    expect(screen.queryByTestId("continuous-pdf")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Continue with Google" }));
+    expect(startGoogleLogin).toHaveBeenCalledWith("http://localhost:3000/read/reader-test");
+  });
+
   it("uses the same-origin PDF stream in a continuous reader without page-turn controls", () => {
     prepare(book);
     render(<ReaderExperience />);

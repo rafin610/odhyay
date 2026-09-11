@@ -168,4 +168,12 @@
 - [x] Replace ODHYAY’s existing brand mark with the supplied logo in shared navigation, footer, and reader branding.
 - [x] Add logo rendering coverage, validate it on desktop and phone layouts, and publish the brand update.
 - [x] Diagnose and repair the broken deployed logo asset reference across ODHYAY branding surfaces.
-- [ ] Verify the repaired logo on the live site and responsive reader/header layouts.
+- [x] Verify the repaired logo on the live site and responsive reader/header layouts.
+
+
+# Current Request: Authentication Required Before Reading
+
+- [x] Require authentication before opening the PDF reader from every book-reading entry point.
+- [x] Show a clear login prompt for logged-out users and preserve the intended book route after login.
+- [x] Add regression coverage for logged-out gating and logged-in reader access, then verify production behavior.
+- [x] Publish the login-required reading update to the Vercel-connected GitHub deployment.
