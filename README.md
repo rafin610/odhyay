@@ -1,626 +1,323 @@
-# 📚 ODHYAY
+# ODHYAY
 
-### বাংলা বই পড়ার একটি আধুনিক ডিজিটাল লাইব্রেরি
+> **A quiet digital library for curious minds.**
 
-**ODHYAY** is a modern Bengali digital library and reading platform designed to make Bengali books easier to discover, read, and manage digitally.
+ODHYAY is a Bengali-first digital library and online reading platform built for calm discovery and comfortable long-form reading. The product combines a premium editorial interface with a persistent book catalog, Google authentication, an administrator workspace, managed media storage, and a high-quality PDF reading experience.
 
-The project focuses on creating a calm, distraction-free reading experience with a premium editorial interface, powerful library management, and a foundation that can later support both web and mobile applications.
+The design language is **Quiet Editorial**: charcoal and warm ivory in dark mode, warm paper tones in light mode, restrained amethyst accents, generous spacing, and typography that keeps the book—not the interface—at the center.
 
----
+**Live website:** [odhyay.vercel.app](https://odhyay.vercel.app)
 
-## ✨ Overview
-
-ODHYAY is built around a simple idea:
-
-> **Books should feel like books — even when they live on a screen.**
-
-Instead of treating digital reading like a typical content website, ODHYAY focuses on:
-
-* 📖 Comfortable reading
-* 🔎 Fast book discovery
-* 🗂️ Organized digital library
-* 🔖 Bookmarks & reading progress
-* ❤️ Personal favorites
-* 🌙 Comfortable dark reading experience
-* 📱 Mobile-friendly experience
-* ⚡ Fast and responsive interface
-* 🧩 Modular architecture for future expansion
+**Managed preview:** [promptweb-mzwhxyal.manus.space](https://promptweb-mzwhxyal.manus.space)
 
 ---
 
-## 🎯 Project Goals
+## Product overview
 
-ODHYAY aims to become a complete digital reading ecosystem for Bengali readers.
+ODHYAY lets visitors browse the library, search for books, inspect book details, and explore categories without signing in. Authentication is required when a user opens a book to read. After Google sign-in, the reader returns the user to the requested book and can persist reading progress and bookmarks against the user’s account.
 
-### Core goals
+The reading room uses a continuous vertical PDF layout rather than a page-turn carousel. It supports high-DPI canvas rendering, responsive fit-to-width behavior, mobile zoom controls, touch-friendly fullscreen scrolling, automatic resume, debounced progress persistence, reader-specific paper themes, and an auto-hiding minimal toolbar.
 
-* Build a beautiful Bengali-first reading experience
-* Make digital books easy to discover
-* Provide a distraction-free reading interface
-* Track reading progress
-* Support bookmarks and favorites
-* Create a scalable book/library architecture
-* Prepare the platform for a dedicated mobile application
-* Keep the codebase maintainable and easy to extend
+Administrators can manage books, authors, categories, covers, PDF files, publication state, and user access from the protected admin workspace.
 
----
+## Highlights
 
-# 🚀 Features
+| Area | Capability |
+| --- | --- |
+| Discovery | Public library, categories, search, book details, responsive shelves, and editorial landing page |
+| Authentication | Google OAuth with persistent sessions and protected reader access |
+| Reading | Continuous vertical PDF reader with high-DPI rendering and virtualized page loading |
+| Mobile | Fit-to-width reading, visible zoom controls, touch scrolling, fullscreen reading, and horizontal panning when zoomed |
+| Persistence | Books, authors, categories, reading progress, bookmarks, favorites, and user roles stored in the database |
+| Administration | Protected book management, local cover upload, PDF upload, metadata editing, deletion, and access management |
+| Themes | Global dark/light theme plus independent Night, Daylight, and Sepia reader themes |
+| Branding | Supplied ODHYAY book-and-bookmark logo used across shared navigation, reader chrome, and branded surfaces |
+| Quality | TypeScript checking, Vitest regression coverage, responsive verification, and production builds |
 
-## 📚 Digital Library
+## Reading experience
 
-Browse and discover Bengali books through a structured digital library.
+The reader is deliberately minimal. Its main behaviors are:
 
-Each book can contain:
+1. **Login before reading.** Public browsing remains open, but the PDF reader is not mounted for unauthenticated visitors.
+2. **Continuous scroll.** Pages are displayed vertically with comfortable separation instead of requiring next/previous page controls.
+3. **Sharp rendering.** PDF.js renders against the device pixel ratio while keeping the canvas CSS size separate from its internal bitmap size.
+4. **Virtualization.** Visible pages and nearby neighbors are rendered first; distant pages can be released to keep memory use manageable on long documents.
+5. **Automatic resume.** The reader restores the last persisted page and percentage for authenticated users.
+6. **Debounced progress.** Meaningful position changes are saved after scrolling settles and are flushed when the reader is left.
+7. **Responsive zoom.** Desktop and phone users can zoom out, fit pages to width, or zoom in. A zoomed mobile page can be horizontally panned without disabling vertical reading.
+8. **Independent appearance controls.** The global site theme and the reader’s paper appearance are separate preferences.
 
-* Book title
-* Author
-* Translator
-* Category
-* Description
-* Cover
-* PDF/book content
-* Reading progress
-* Favorites
-* Bookmarks
-* Metadata
+## Technology stack
 
----
+| Layer | Technology |
+| --- | --- |
+| Client | React 19, TypeScript, Vite, Wouter, Tailwind CSS 4 |
+| UI | Radix UI primitives, custom ODHYAY components, Lucide icons, Sonner notifications |
+| Server | Node.js, Express 5, tRPC 11, SuperJSON |
+| Database | TiDB Cloud / MySQL-compatible database through Drizzle ORM and `mysql2` |
+| Storage | Vercel Blob in production; managed storage helpers for server-side file access |
+| Authentication | Google OAuth, signed session cookies, persistent user records, role-aware authorization |
+| Documents | PDF.js (`pdfjs-dist`) with a same-origin PDF delivery endpoint |
+| Validation | Zod, TypeScript, Vitest, Testing Library, JSDOM |
+| Deployment | Vercel for production, with GitHub-connected deployments |
 
-## 🔍 Search & Discovery
+## Architecture
 
-Find books quickly through the library.
-
-The architecture is designed to support:
-
-* Book title search
-* Author search
-* Category filtering
-* Bengali search
-* Banglish search
-* Future advanced search
-
----
-
-## 📖 Reading Experience
-
-ODHYAY is designed around comfortable long-form reading.
-
-The reader focuses on:
-
-* Clean typography
-* Generous spacing
-* Distraction-free layout
-* Reading progress
-* Bookmarks
-* Resume reading
-* Dark reading environment
-
----
-
-## 🔖 Reading Progress
-
-The platform can track where a reader stopped.
-
-Users can return to a book and continue from their previous reading position.
-
-Example:
+ODHYAY uses a typed request path from the React client to protected server procedures and persistence helpers:
 
 ```text
-শেষবার পড়েছিলেন — পৃষ্ঠা ৪৭
-Progress — 15%
+┌──────────────────────────────────────────────────────────┐
+│ React pages and shared UI                                │
+│ catalog · details · reader · admin · theme system        │
+└──────────────────────────────┬───────────────────────────┘
+                               │ tRPC + React Query
+┌──────────────────────────────▼───────────────────────────┐
+│ Express / tRPC server                                    │
+│ public procedures · protected procedures · admin checks   │
+└───────────────┬──────────────────────────┬───────────────┘
+                │                          │
+┌───────────────▼──────────────┐  ┌────────▼───────────────┐
+│ Drizzle + TiDB/MySQL         │  │ Managed media storage   │
+│ books · users · progress     │  │ covers · original PDFs  │
+│ bookmarks · favorites        │  │ Vercel Blob in prod     │
+└──────────────────────────────┘  └────────────────────────┘
 ```
 
----
-
-## ❤️ Favorites
-
-Users can save books to their personal favorites/library.
-
-This creates a more personalized reading experience without requiring users to search for the same book repeatedly.
-
----
-
-## 🔖 Bookmarks
-
-Readers can save important pages for returning later.
-
-The bookmark architecture is designed to support future synchronization across devices.
-
----
-
-## 🌙 Quiet Editorial UI
-
-ODHYAY uses a design language called:
-
-### Quiet Editorial
-
-The interface intentionally avoids loud visual elements.
-
-The design focuses on:
-
-* Calm colors
-* Warm typography
-* Generous whitespace
-* Minimal UI
-* Editorial hierarchy
-* Comfortable reading
-
-### Dark Mode
-
-* Charcoal background
-* Warm ivory typography
-* Amethyst accent
-
-### Light Mode
-
-* Warm paper/sepia background
-* Soft warm dark-brown typography
-* Amethyst accent
-
-The goal is to make reading feel closer to reading a physical book.
-
----
-
-# 🧠 Architecture
-
-ODHYAY is designed as a modular application where the UI, business logic, and data access are separated.
+The repository keeps the main application boundaries explicit:
 
 ```text
-┌──────────────────────────────┐
-│          UI Layer            │
-│   Pages / Components / UX    │
-└──────────────┬───────────────┘
-               │
-               ↓
-┌──────────────────────────────┐
-│       Application Layer      │
-│ Hooks / State / Logic        │
-└──────────────┬───────────────┘
-               │
-               ↓
-┌──────────────────────────────┐
-│        Service Layer         │
-│ Books / Users / Reading      │
-│ Favorites / Bookmarks        │
-└──────────────┬───────────────┘
-               │
-               ↓
-┌──────────────────────────────┐
-│       Backend / Database     │
-│ API / Authentication / DB    │
-└──────────────────────────────┘
+client/
+  src/
+    components/       Shared shell, reader, UI, and layout components
+    contexts/         Global theme context
+    pages/            Public, reader, and administrator pages
+    lib/              Client helpers such as PDF URLs and reader themes
+    _core/hooks/      Authentication hook and client-side framework helpers
+    App.tsx           Route definitions and lazy page loading
+server/
+  _core/              Express, tRPC, OAuth, storage, and runtime plumbing
+  db.ts               Drizzle database helpers
+  routers.ts          Typed tRPC procedures
+  googleOAuth.ts      Google sign-in and callback handling
+  pdfReader.ts        Same-origin PDF delivery
+  pdfUpload.ts        Managed PDF upload validation and persistence
+  storage.ts          Storage abstraction
+  vercelBlobUpload.ts Vercel Blob integration
+  *.test.ts           Server regression and persistence tests
+drizzle/
+  schema.ts           Database schema
+  migrations/         Generated migration files
+shared/
+  const.ts            Shared server/client constants
+  types.ts            Shared application types
+vercel.json            Vercel routing, build, and API function configuration
 ```
 
-This separation is intentional.
+## Getting started
 
-The frontend should not depend directly on database implementation details.
+### Prerequisites
 
----
+Install the following before starting local development:
 
-# 🛠️ Tech Stack
+- Node.js 20 or newer.
+- `pnpm` 10 or newer.
+- A MySQL-compatible database, such as TiDB Cloud Serverless, for persistent data.
+- Google OAuth credentials if local sign-in is required.
+- Vercel Blob credentials if local media upload or production storage access is required.
 
-The exact stack may evolve during development, but the project is built around modern web technologies.
-
-### Frontend
-
-* React
-* TypeScript
-* Vite
-* Tailwind CSS
-* shadcn/ui
-* Framer Motion
-
-### Backend
-
-* Node.js
-* Express
-* tRPC
-
-### Data & Infrastructure
-
-* Supabase
-* PostgreSQL
-* Supabase Storage
-* Authentication
-
-### Development
-
-* Git
-* GitHub
-* ESLint
-* Prettier
-* Vite
-
----
-
-# 📁 Project Structure
-
-A simplified structure:
-
-```text
-odhyay/
-│
-├── src/
-│   ├── components/
-│   ├── pages/
-│   ├── hooks/
-│   ├── services/
-│   ├── context/
-│   ├── lib/
-│   ├── types/
-│   └── ...
-│
-├── public/
-│
-├── api/
-│
-├── supabase/
-│   └── schema.sql
-│
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-├── tailwind.config.*
-└── README.md
-```
-
-The exact structure may change as the project evolves.
-
----
-
-# ⚙️ Getting Started
-
-## Prerequisites
-
-Make sure you have installed:
-
-* Node.js
-* npm / pnpm
-* Git
-
-Check your versions:
-
-```bash
-node -v
-npm -v
-git --version
-```
-
----
-
-## 1. Clone the repository
-
-```bash
-git clone https://github.com/rafin610/odhyay.git
-```
-
-Move into the project:
-
-```bash
-cd odhyay
-```
-
----
-
-## 2. Install dependencies
-
-```bash
-npm install
-```
-
-or, if the project uses pnpm:
+### Install dependencies
 
 ```bash
 pnpm install
 ```
 
----
+### Configure environment variables
 
-## 3. Environment Variables
-
-Create a local environment file:
+Create a local environment file for development. Do not commit it:
 
 ```bash
-.env
+cp .env.example .env
 ```
 
-Add the required project variables.
+If the repository does not contain an `.env.example` in your checkout, create `.env` manually and define the variables required by your selected runtime. The application reads configuration through the server runtime environment; secrets must not be hardcoded in source files.
 
-Example:
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | TiDB/MySQL connection string used by Drizzle and the server |
+| `JWT_SECRET` | Session signing secret |
+| `GOOGLE_CLIENT_ID` | Google OAuth client identifier |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+| `VITE_APP_ID` | Application identity used by the runtime integration |
+| `OAUTH_SERVER_URL` | OAuth service base URL used by the runtime |
+| `BUILT_IN_FORGE_API_URL` | Server-side managed API base URL when enabled |
+| `BUILT_IN_FORGE_API_KEY` | Server-side managed API credential when enabled |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob read/write token for media operations |
+| `BLOB_STORE_ID` | Vercel Blob store identifier, when required by the deployment adapter |
+| `OWNER_OPEN_ID` | Owner identity used by project-level access checks |
+| `PORT` | Optional local/server port; the runtime may supply this automatically |
+| `NODE_ENV` | `development` or `production` |
 
-```env
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
-```
+Use the platform’s secret manager for production values. Never place real OAuth, database, session, or storage credentials in GitHub.
 
-Never commit private keys, service-role keys, or other secrets to GitHub.
+### Database setup
 
----
-
-# ▶️ Run Locally
-
-Start the development server:
+Generate and apply the Drizzle migration through the project script:
 
 ```bash
-npm run dev
+pnpm db:push
 ```
 
-or:
+The schema includes users, books, authors, categories, reading progress, bookmarks, favorites, and the relationships required by the application. The production database should be treated as persistent state; review migrations carefully before applying destructive changes.
+
+### Start the development server
 
 ```bash
 pnpm dev
 ```
 
-Then open the local development URL shown in your terminal.
+The development server starts the full Express/Vite application. Open the URL printed in the terminal, usually `http://localhost:3000`.
 
----
+## Development commands
 
-# 🗄️ Database
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Start the full-stack development server with file watching |
+| `pnpm test` | Run the complete Vitest suite |
+| `pnpm check` | Run TypeScript without emitting files |
+| `pnpm build` | Build the Vite client and bundled production server |
+| `pnpm build:vercel` | Build the Vercel-compatible static client output |
+| `pnpm start` | Start the bundled production server |
+| `pnpm format` | Format repository files with Prettier |
+| `pnpm db:push` | Generate and apply Drizzle migrations |
 
-ODHYAY uses a backend database for persistent application data.
-
-Typical entities include:
-
-```text
-Users
-Authors
-Categories
-Books
-Reading Progress
-Favorites
-Bookmarks
-```
-
-Database schema and migrations should be managed separately from frontend UI logic.
-
----
-
-# 🔐 Authentication
-
-Authentication is designed to support authenticated users and protected user-specific functionality.
-
-User-specific information may include:
-
-* Favorites
-* Bookmarks
-* Reading progress
-* Profile information
-
-Authentication implementation should remain isolated from the UI so it can evolve independently.
-
----
-
-# 📦 Storage
-
-Book-related assets such as:
-
-* PDF files
-* Cover images
-* Other media
-
-should be handled through dedicated storage infrastructure rather than being embedded directly into the frontend application.
-
----
-
-# 📱 Future Mobile Application
-
-ODHYAY is designed with a future dedicated mobile application in mind.
-
-The planned mobile application will use:
-
-```text
-ODHYAY Web
-      │
-      ├─────────────┐
-      ↓             ↓
-   ODHYAY API   ODHYAY Mobile
-      │             │
-      └──────┬──────┘
-             ↓
-        Same Backend
-             ↓
-        Same Database
-```
-
-The mobile application will focus heavily on:
-
-* Offline reading
-* Secure app-private book storage
-* Reading progress
-* Bookmarks
-* Favorites
-* Mobile-first reading UX
-
-The web and mobile applications are intended to share the same backend ecosystem.
-
----
-
-# 🎨 Design Philosophy
-
-ODHYAY follows a **Quiet Editorial** design philosophy.
-
-The interface is intentionally restrained.
-
-Instead of maximizing visual elements, the design prioritizes:
-
-### Readability
-
-Typography should remain comfortable during long reading sessions.
-
-### Hierarchy
-
-Important information should be immediately understandable.
-
-### Whitespace
-
-Space is treated as part of the interface.
-
-### Calmness
-
-The UI should not compete with the book.
-
-### Consistency
-
-Colors, typography, spacing, components, and interactions should follow a unified system.
-
----
-
-# 🧩 Development Principles
-
-When contributing to ODHYAY, follow these principles:
-
-### 1. Keep components small
-
-Avoid large components containing unrelated logic.
-
-### 2. Separate business logic
-
-Move reusable logic into hooks/services instead of placing everything inside pages.
-
-### 3. Keep data access abstracted
-
-Components should not directly depend on database implementation.
-
-### 4. Reuse existing components
-
-Before creating a new UI component, check whether an existing component can be reused.
-
-### 5. Maintain Bengali typography
-
-Never introduce styling that causes Bengali glyph clipping or broken line-height.
-
-### 6. Preserve the design language
-
-New screens should feel like part of ODHYAY.
-
-### 7. Avoid unnecessary dependencies
-
-Only add a dependency when it provides meaningful value.
-
----
-
-# 🧪 Quality & Testing
-
-Before pushing changes, check:
+Before opening a pull request, run at least:
 
 ```bash
-npm run build
+pnpm test && pnpm check && pnpm build
 ```
 
-Also verify:
+## Authentication and authorization
 
-* TypeScript compilation
-* Production build
-* Responsive layouts
-* Dark mode
-* Light mode
-* Navigation
-* Authentication flows
-* Book loading
-* Reading progress
-* Favorites
-* Bookmarks
-* Error states
-* Loading states
+Google sign-in is initiated explicitly by the client and completed by the server callback. Successful authentication creates or updates the persistent user record and establishes a signed session cookie.
 
----
+The application distinguishes between three access levels:
 
-# 🚧 Roadmap
+| Access level | Typical access |
+| --- | --- |
+| Visitor | Public home, library, categories, search, and book details |
+| Authenticated reader | Book reader, reading progress, bookmarks, and favorites |
+| Administrator | Book management, uploads, deletion, and user/access management |
 
-## Phase 1 — Foundation
+Reader access is intentionally protected at the page boundary. A logged-out user sees a sign-in prompt rather than a partially loaded PDF. The OAuth return path is constrained to the same origin and rejects external or API redirect targets.
 
-* [x] Core web application
-* [x] Library interface
-* [x] Book discovery
-* [x] Reading experience
-* [x] Responsive UI
-* [x] Theme system
-* [x] Backend architecture
+When adding a protected feature, prefer the existing typed procedure patterns:
 
-## Phase 2 — Platform Improvements
+```ts
+// Server-side pattern
+const protectedData = protectedProcedure.query(async ({ ctx }) => {
+  // ctx.user is available here
+});
 
-* [ ] Advanced search
-* [ ] Better recommendations
-* [ ] Improved reading experience
-* [ ] Enhanced bookmarks
-* [ ] Reading statistics
-* [ ] Improved admin controls
+// Administrator-only pattern
+const adminData = adminProcedure.query(async ({ ctx }) => {
+  // ctx.user.role has already been checked
+});
+```
 
-## Phase 3 — Mobile
+On the client, use the existing authentication hook and call the login launcher only from an event handler. Do not mint OAuth URLs during render.
 
-* [ ] Dedicated Expo/React Native application
-* [ ] Offline book downloads
-* [ ] App-private book storage
-* [ ] Mobile PDF reader
-* [ ] Reading synchronization
-* [ ] Cross-device progress
+## Media and PDF handling
 
-## Phase 4 — ODHYAY Ecosystem
+Book covers and PDFs are stored outside the database. The database stores metadata and storage references; file bytes remain in managed object storage. PDFs are served through a same-origin reader endpoint so PDF.js can load them without redirect-CORS failures.
 
-* [ ] Unified web + mobile experience
-* [ ] Cross-device library
-* [ ] Personalized recommendations
-* [ ] Advanced reader tools
-* [ ] More content formats
-* [ ] Subscription/premium features where appropriate
+The upload flow validates file type, size, and content signature before persisting metadata. The reader preserves the original PDF binary and performs rendering in the browser. It does not convert uploaded PDFs to JPG or WebP.
 
----
+For new media features:
 
-# 🔮 Future Reader Features
+1. Store bytes in the managed storage layer.
+2. Store only the storage key and relevant metadata in the database.
+3. Enforce authorization before accepting uploads or returning protected media.
+4. Keep public URLs and signed URLs out of database seed fixtures unless the application explicitly requires them.
+5. Test both rejected uploads and successful persistence paths.
 
-Potential future features include:
+## Deployment
 
-* AI-powered book summaries
-* Ask questions about books
-* Translation
-* AI explanations
-* Notes
-* Highlights
-* Advanced search inside books
-* Reading statistics
-* Personalized recommendations
+The production application is deployed through a GitHub-connected Vercel project. `vercel.json` routes `/api/*` requests to the serverless API function and sends non-API routes to the client application for SPA navigation.
 
-These features are intentionally kept modular so they can be introduced without disrupting the core reading experience.
+A typical release workflow is:
 
----
+```bash
+git status
+git add .
+git commit -m "describe the change"
+git push origin main
+```
 
-# 🤝 Contributing
+Vercel then builds the connected branch using the project configuration. Confirm that the deployment is ready before considering a release complete. After deployment, verify public browsing, Google sign-in, reader access, administrator authorization, media upload, PDF delivery, and persistence flows.
 
-ODHYAY is currently under active development.
+For production Google OAuth, register the exact callback URL for the deployed domain:
 
-Before making significant changes:
+```text
+https://<your-domain>/api/auth/google/callback
+```
 
-1. Understand the existing architecture.
-2. Check existing components/services.
-3. Keep changes focused.
-4. Preserve the design system.
-5. Test the affected flows.
-6. Make sure production builds successfully.
+The callback origin must match the host serving the request. If a custom domain is introduced, register that domain separately in the Google OAuth client configuration.
 
----
+## Testing strategy
 
-# 📄 License
+The test suite covers both pure logic and user-visible behavior. It includes:
 
-The licensing model for ODHYAY is currently under development.
+- Google identity normalization and OAuth redirect safety.
+- Authentication, session continuity, and administrator authorization.
+- Book, category, author, progress, bookmark, and favorite persistence.
+- PDF upload validation, same-origin delivery, and reader error states.
+- Continuous reader rendering, high-DPI sizing, zoom, fullscreen scrolling, resume state, and debounced progress.
+- Navigation, branding, theme persistence, contrast, responsive interactions, and admin workflows.
 
-Unless explicitly permitted, do not redistribute copyrighted books, PDFs, or other protected content.
+Tests should be deterministic and must not seed arbitrary customer reviews, ratings, testimonials, or other fabricated user-generated content. Persistence tests should clean up temporary records and must not rely on an empty production database.
 
----
+## Data and security principles
 
-# 👨‍💻 Project
+ODHYAY treats the database as persistent application state and object storage as the source of truth for uploaded media bytes. Server procedures—not client visibility alone—enforce access control. Session secrets, Google credentials, database URLs, and storage tokens are environment-managed secrets.
 
-**ODHYAY**
+When changing schema or authorization:
 
-A Bengali digital library built around a simple idea:
+1. Update the Drizzle schema and inspect the generated migration.
+2. Apply migrations through the approved database workflow.
+3. Add or update database helpers.
+4. Add typed tRPC procedures with the narrowest appropriate access level.
+5. Add tests for allowed and rejected paths.
+6. Validate the browser flow and production deployment.
 
-> **Read quietly. Discover deeply.**
+Avoid destructive SQL unless the consequences are understood and a recovery path exists. Do not store file bytes in database columns, expose administrator procedures as public procedures, or trust client-side role checks as authorization.
 
----
+## Design principles
 
-### Status
+ODHYAY’s visual system is intentionally restrained:
 
-🟡 **Active Development**
+- **Quiet Editorial:** editorial hierarchy, warm paper surfaces, charcoal depth, and amethyst accents.
+- **Reading first:** controls appear when useful and stay visually subordinate to the document.
+- **Responsive by default:** mobile reading uses fit-to-width, touch-sized controls, and safe horizontal behavior when zoomed.
+- **Accessible interaction:** focus states, semantic labels, readable contrast, and reduced-motion support are part of the component contract.
+- **No false social proof:** the product must never fabricate reviews, ratings, or testimonials.
 
-ODHYAY is continuously evolving as the platform's architecture, reading experience, and ecosystem are improved.
+## Contributing
 
+Before proposing a change, describe the user-facing behavior and the affected data or authorization boundary. Keep changes focused, reuse existing shared components, and add regression coverage for every new flow or bug fix.
+
+A useful pull request should explain what changed, why it changed, how it was tested, and whether database migrations, new environment variables, OAuth callback updates, or deployment configuration changes are required.
+
+## License
+
+This repository is licensed under the MIT License. See [`package.json`](./package.json) for the project license declaration.
+
+## References
+
+[1]: https://react.dev/ "React documentation"
+[2]: https://www.typescriptlang.org/docs/ "TypeScript documentation"
+[3]: https://vite.dev/guide/ "Vite documentation"
+[4]: https://trpc.io/docs "tRPC documentation"
+[5]: https://orm.drizzle.team/docs/overview "Drizzle ORM documentation"
+[6]: https://vercel.com/docs "Vercel documentation"
+[7]: https://developers.google.com/identity/protocols/oauth2 "Google OAuth documentation"
+[8]: https://mozilla.github.io/pdf.js/ "PDF.js documentation"
