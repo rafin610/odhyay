@@ -8,7 +8,7 @@ The design language is **Quiet Editorial**: charcoal and warm ivory in dark mode
 
 **Live website:** [odhyay.vercel.app](https://odhyay.vercel.app)
 
-
+**Managed preview:** [promptweb-mzwhxyal.manus.space](https://promptweb-mzwhxyal.manus.space)
 
 ---
 

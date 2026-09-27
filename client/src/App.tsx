@@ -23,7 +23,7 @@ const AdminPersistentNewBookPage = lazy(async () => ({ default: (await loadAdmin
 const AdminPersistentAccessPage = lazy(async () => ({ default: (await loadAdmin()).AdminPersistentAccessPage }));
 
 function PageLoading() {
-  return <div className="grid min-h-screen place-items-center bg-[#111015] px-6 text-center text-[#f3eee6]"><div><p className="eyebrow text-amethyst">ODHYAY</p><p className="mt-4 text-sm text-[#9b93a1]">Opening a quiet page…</p></div></div>;
+  return <div className="grid min-h-screen place-items-center od-page px-6 text-center"><div><p className="eyebrow od-accent">ODHYAY</p><p className="mt-4 text-sm od-muted">Opening a quiet page…</p></div></div>;
 }
 
 function Router() {

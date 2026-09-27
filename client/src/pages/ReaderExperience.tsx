@@ -90,6 +90,14 @@ export default function ReaderExperience() {
     return () => window.clearTimeout(timer);
   }, [progress, visiblePage]);
 
+  // Quiet Editorial: remember the last opened book locally so Home can offer Continue Reading without a new backend endpoint.
+  useEffect(() => {
+    if (!book) return;
+    try {
+      window.localStorage.setItem("odhyay-last-read", JSON.stringify({ slug: book.slug, title: book.title, author: book.authorName, cover: book.coverUrl || "", page: visiblePage, pages: pdfPages || book.pageCount || 1, progress }));
+    } catch { /* quiet */ }
+  }, [book?.slug, visiblePage, progress, pdfPages]);
+
   useEffect(() => {
     const flush = () => persistProgressRef.current(true);
     window.addEventListener("pagehide", flush);
