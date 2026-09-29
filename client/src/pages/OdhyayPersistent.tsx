@@ -87,19 +87,19 @@ function ContinueReading({ books }: { books: Book[] }) {
   const title = match?.title ?? last.title;
   const author = match?.author ?? last.author;
   return (
-    <section className="container pt-14 sm:pt-20" aria-label="Continue reading">
+    <section className="container pt-16 sm:pt-24" aria-label="Continue reading">
       <SectionLabel number="02">Continue reading</SectionLabel>
-      <div className="grid gap-6 border p-5 sm:p-7 lg:grid-cols-[120px_1fr_auto] lg:items-center lg:gap-10" style={{ borderColor: "var(--od-border)", background: "var(--od-surface-raised)" }}>
+      <div className="mx-auto grid max-w-4xl gap-6 border p-6 sm:p-8 lg:grid-cols-[120px_1fr_auto] lg:items-center lg:gap-8" style={{ borderColor: "var(--od-border)", background: "var(--od-surface-raised)" }}>
         <Link href={`/book/${last.slug}`} className="focus-ring mx-auto block w-[120px] shrink-0 sm:mx-0" aria-label={`Open ${title}`}>
           <div className="aspect-[2/3] overflow-hidden cover-shadow"><img src={cover} alt={`${title} cover`} className="h-full w-full object-cover" loading="lazy" /></div>
         </Link>
         <div className="min-w-0 text-center sm:text-left lg:text-left">
-          <p className="eyebrow od-subtle">The book you started is waiting</p>
-          <h3 className="font-display mt-3 text-[1.7rem] leading-tight">{title}</h3>
-          <p className="mt-2 text-sm od-muted">{author}</p>
-          <div className="mx-auto mt-5 max-w-md sm:mx-0"><ReadingProgress value={last.progress} /><p className="mt-2 text-xs od-muted tabular-nums">{last.progress}% · Page {last.page}{last.pages ? ` of ${last.pages}` : ""}</p></div>
+          <p className="text-xs font-semibold tracking-wide od-subtle">The book you started is waiting</p>
+          <h2 className="font-display mt-1.5 text-2xl font-medium leading-tight sm:text-[1.7rem]">{title}</h2>
+          <p className="mt-1 text-sm od-muted">{author}</p>
+          <div className="mx-auto mt-4 max-w-md sm:mx-0"><ReadingProgress value={last.progress} /><p className="mt-2 text-xs od-muted tabular-nums">{last.progress}% · Page {last.page}{last.pages ? ` of ${last.pages}` : ""}</p></div>
         </div>
-        <Link href={`/read/${last.slug}`} className="focus-ring od-button od-button-primary w-full lg:w-auto">Continue reading <ArrowRight size={15} /></Link>
+        <Link href={`/read/${last.slug}`} className="focus-ring od-button od-button-primary w-full shrink-0 lg:w-auto">Continue reading <ArrowRight size={15} /></Link>
       </div>
     </section>
   );
@@ -164,26 +164,20 @@ export function HomePersistentPage() {
 
     {/* FEATURED */}
     <section className="container od-section" aria-label="Featured books">
-      <SectionHeading eyebrow="Featured" title={<>Books worth <span className="italic od-accent">your time.</span></>} description="A small, deliberate selection — chosen for clarity, depth, and the feeling that stays after the last page." action={<Link href="/library" className="focus-ring inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.16em] od-accent">View all <ArrowRight size={14} /></Link>} />
+      <div className="mb-10 flex flex-wrap items-end justify-between gap-6 sm:mb-12">
+        <SectionHeading className="max-w-2xl" eyebrow="Featured" title={<>Books worth <span className="italic od-accent">your time.</span></>} description="A small, deliberate selection — chosen for clarity, depth, and the feeling that stays after the last page." />
+        <Link href="/library" className="focus-ring inline-flex min-h-10 items-center gap-2 text-xs font-bold uppercase tracking-[.16em] od-accent">View all <ArrowRight size={14} /></Link>
+      </div>
       {items.length ? <BookGrid items={items.slice(0, 4)} /> : <QueryNotice loading={library.isLoading} error={library.error} empty="Your library is waiting for its first chapter." onRetry={() => void library.refetch()} />}
     </section>
 
     {/* CATEGORY EXPLORATION — elegant pills */}
     <section className="border-y hairline" style={{ background: "var(--od-surface-raised)" }} aria-label="Explore by category">
       <div className="container od-section">
-        <div className="grid min-w-0 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16">
-          <div className="min-w-0">
-            <SectionHeading eyebrow="Explore by category" title="Follow what pulls you." description="No giant cards. Just quiet directions — pick a thread and see where it leads." />
-            <CategoryFilter options={[{ name: "All" }, ...categoryNames.map((n) => ({ name: n, slug: n }))]} value={homeCategory} onChange={(slug) => setHomeCategory(slug)} />
-          </div>
-          <div className="min-w-0">
-            <div className="flex flex-wrap gap-2">
-              {(categories.data ?? []).slice(0, 6).map((c) => <Link key={c.id} href={`/search?q=${encodeURIComponent(c.name)}`} className="focus-ring od-pill min-w-0"><span className="min-w-0 break-words">{c.name}</span></Link>)}
-            </div>
-            <div className="mt-10">
-              {filtered.length ? <BookGrid items={filtered.slice(0, 4)} /> : <p className="py-6 text-sm od-muted">{homeCategory ? `No books on the “${homeCategory}” shelf yet.` : "Books will appear here once published."}</p>}
-            </div>
-          </div>
+        <SectionHeading eyebrow="Explore by category" title="Follow what pulls you." description="No giant cards. Just quiet directions — pick a thread and see where it leads." />
+        <CategoryFilter options={[{ name: "All" }, ...categoryNames.map((n) => ({ name: n, slug: n }))]} value={homeCategory} onChange={(slug) => setHomeCategory(slug)} />
+        <div className="mt-10">
+          {filtered.length ? <BookGrid items={filtered.slice(0, 4)} /> : <p className="py-6 text-sm od-muted">{homeCategory ? `No books on the “${homeCategory}” shelf yet.` : "Books will appear here once published."}</p>}
         </div>
       </div>
     </section>
@@ -203,7 +197,7 @@ export function HomePersistentPage() {
     <section className="border-t hairline" aria-label="New to Odhyay">
       <div className="container od-section">
         <div className="mb-10 flex flex-wrap items-end justify-between gap-6 sm:mb-12">
-          <SectionHeading eyebrow="New to ODHYAY" title="Recently added." description="Fresh arrivals on the shelf." />
+          <SectionHeading className="max-w-2xl" eyebrow="New to ODHYAY" title="Recently added." description="Fresh arrivals on the shelf." />
           <Link href="/library" className="focus-ring inline-flex min-h-10 items-center gap-2 text-xs font-bold uppercase tracking-[.16em] od-accent">View all <ArrowRight size={14} /></Link>
         </div>
         {recent.length ? <BookGrid items={recent.slice(0, 4)} /> : library.isLoading ? <QueryNotice loading error={null} empty="" /> : <EditorialEmptyShelf />}

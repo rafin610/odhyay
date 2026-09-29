@@ -35,17 +35,44 @@ export function Header() {
 }
 
 export function Footer() {
-  return <footer className="border-t hairline py-12 sm:py-16"><div className="container"><div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between"><div className="max-w-sm"><Logo /><p className="mt-5 text-sm leading-7 od-muted">A calm digital library for curious minds.<br />Reading should feel quiet again.</p></div><nav aria-label="Footer" className="grid grid-cols-2 gap-x-12 gap-y-3 text-sm sm:flex sm:gap-8"><Link href="/library" className="focus-ring od-muted od-hover-ink">Library</Link><Link href="/categories" className="focus-ring od-muted od-hover-ink">Categories</Link><Link href="/search" className="focus-ring od-muted od-hover-ink">Search</Link><Link href="/about" className="focus-ring od-muted od-hover-ink">About ODHYAY</Link></nav></div><div className="mt-12 flex flex-col gap-3 border-t hairline pt-6 text-xs od-subtle sm:flex-row sm:items-center sm:justify-between"><span>© 2026 ODHYAY. Quietly made for readers.</span><span className="tracking-[.14em] uppercase">Read with intention</span></div></div></footer>;
+  return <footer className="border-t hairline py-14 sm:py-16">
+    <div className="container">
+      <div className="grid gap-10 md:grid-cols-[1.2fr_1fr] md:items-start md:gap-16">
+        <div className="max-w-sm">
+          <Logo />
+          <p className="mt-4 text-sm leading-relaxed od-muted">A calm digital library for curious minds.<br />Reading should feel quiet again.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-8 text-sm sm:gap-12 md:justify-items-end">
+          <nav aria-label="Explore navigation" className="flex flex-col gap-2.5">
+            <span className="text-xs font-semibold uppercase tracking-wider od-subtle">Explore</span>
+            <Link href="/library" className="focus-ring od-muted od-hover-ink">Library</Link>
+            <Link href="/categories" className="focus-ring od-muted od-hover-ink">Categories</Link>
+            <Link href="/search" className="focus-ring od-muted od-hover-ink">Search</Link>
+          </nav>
+          <nav aria-label="ODHYAY links" className="flex flex-col gap-2.5">
+            <span className="text-xs font-semibold uppercase tracking-wider od-subtle">ODHYAY</span>
+            <Link href="/about" className="focus-ring od-muted od-hover-ink">About</Link>
+            <a href="https://github.com/rafin610/odhyay" target="_blank" rel="noreferrer" className="focus-ring od-muted od-hover-ink">Source</a>
+            <Link href="/about#philosophy" className="focus-ring od-muted od-hover-ink">Philosophy</Link>
+          </nav>
+        </div>
+      </div>
+      <div className="mt-12 flex flex-col gap-3 border-t hairline pt-8 text-xs od-subtle sm:flex-row sm:items-center sm:justify-between">
+        <span>© 2026 ODHYAY. Quietly made for readers.</span>
+        <span className="font-medium tracking-wide">Read with intention</span>
+      </div>
+    </div>
+  </footer>;
 }
 export function PageFrame({ children, footer = true }: { children: React.ReactNode; footer?: boolean }) { return <div className="od-page min-h-screen overflow-x-clip"><Header /><div className="page-entrance">{children}</div>{footer && <Footer />}</div>; }
 export function SectionLabel({ children, number }: { children: React.ReactNode; number?: string }) { return <div className="mb-6 flex items-center gap-3 od-muted"><span className="eyebrow">{number ? `${number} / ` : ""}{children}</span><span className="h-px flex-1" style={{ background: "var(--od-border)" }} /></div>; }
 
-export function SectionHeading({ eyebrow, title, description, action }: { eyebrow: string; title: React.ReactNode; description?: string; action?: React.ReactNode }) {
-  return <div className="mb-10 max-w-2xl sm:mb-12"><p className="eyebrow od-accent">{eyebrow}</p><h2 className="font-display mt-4 text-[clamp(2rem,4.5vw,3.4rem)] leading-[1.02] tracking-[-.02em]">{title}</h2>{description ? <p className="mt-4 max-w-xl text-[15px] leading-7 od-muted">{description}</p> : null}{action ? <div className="mt-5">{action}</div> : null}</div>;
+export function SectionHeading({ eyebrow, title, description, action, className }: { eyebrow: string; title: React.ReactNode; description?: string; action?: React.ReactNode; className?: string }) {
+  return <div className={className ?? "mb-10 max-w-2xl sm:mb-12"}><p className="eyebrow od-accent">{eyebrow}</p><h2 className="font-display mt-4 text-[clamp(2rem,4.5vw,3.4rem)] leading-[1.02] tracking-[-.02em]">{title}</h2>{description ? <p className="mt-4 max-w-xl text-[15px] leading-7 od-muted">{description}</p> : null}{action ? <div className="mt-5">{action}</div> : null}</div>;
 }
 
 export function CategoryFilter({ options, value, onChange }: { options: { slug?: string; name: string }[]; value?: string; onChange: (slug?: string) => void }) {
-  return <div className="scrollbar-hidden -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0"><div className="flex min-w-max items-center gap-2 sm:flex-wrap" role="tablist" aria-label="Filter by category">{options.map((opt) => {
+  return <div className="scrollbar-hidden -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0"><div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Filter by category">{options.map((opt) => {
     const active = (value ?? undefined) === opt.slug;
     return <button key={opt.name} role="tab" aria-selected={active} aria-pressed={active} onClick={() => onChange(opt.slug)} className={`focus-ring od-pill ${active ? "od-pill-active" : ""}`}>{opt.name}</button>;
   })}</div></div>;
@@ -58,6 +85,8 @@ export function ReadingProgress({ value }: { value: number }) {
 }
 
 export function BookCard({ book, index = 0 }: { book: Book; index?: number }) {
+  const cleanCategory = (book.category ?? "").replace(/\.+$/, "");
+  const cleanAuthor = (book.author ?? "").replace(/\.+$/, "");
   return <Link href={`/book/${book.slug}`} className={`book-card focus-ring group block reveal reveal-delay-${Math.min(index, 3)}`}>
     <div className="cover-frame relative aspect-[2/3] overflow-hidden cover-shadow">
       <div className="relative size-full overflow-hidden" style={{ background: "var(--od-surface-muted)" }}>
@@ -65,7 +94,11 @@ export function BookCard({ book, index = 0 }: { book: Book; index?: number }) {
         {typeof book.progress === "number" ? <div className="absolute inset-x-0 bottom-0 h-[3px]" style={{ background: "color-mix(in srgb, var(--od-ink) 12%, transparent)" }}><div className="h-full" style={{ width: `${book.progress}%`, background: "var(--od-accent)" }} /></div> : null}
       </div>
     </div>
-    <div className="book-meta pt-4"><h3 className="font-display text-[1.22rem] leading-[1.2] od-ink">{book.title}</h3><p className="mt-1.5 truncate text-[13px] od-muted">{book.author}</p><p className="mt-1.5 text-[.64rem] font-bold uppercase tracking-[.14em] od-subtle">{book.category}</p></div>
+    <div className="book-meta pt-4">
+      <h3 className="font-display text-[1.15rem] leading-[1.25] line-clamp-2 min-h-[2.85rem] od-ink">{book.title}</h3>
+      <p className="mt-1.5 text-xs od-muted line-clamp-1">{cleanAuthor}</p>
+      <p className="mt-1.5 text-xs font-semibold uppercase tracking-[.12em] od-subtle">{cleanCategory}</p>
+    </div>
   </Link>;
 }
 export function BookGrid({ items }: { items: Book[] }) { const singleShelf = items.length === 1; const layout = singleShelf ? "grid-cols-1 max-w-[280px] sm:max-w-[320px]" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"; return <div className={`grid gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12 lg:gap-x-8 ${layout}`}>{items.map((book, index) => <BookCard key={book.slug} book={book} index={index} />)}</div>; }
