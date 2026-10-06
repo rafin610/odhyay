@@ -70,6 +70,19 @@ export const bookmarks = mysqlTable("bookmarks", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, (table) => [uniqueIndex("bookmarks_user_book_page_uq").on(table.userId, table.bookId, table.pageNumber)]);
 
+export const bookReviews = mysqlTable("book_reviews", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  bookId: int("bookId").notNull().references(() => books.id, { onDelete: "cascade" }),
+  rating: int("rating").notNull(),
+  review: text("review"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => [
+  uniqueIndex("book_reviews_user_book_uq").on(table.userId, table.bookId),
+  index("book_reviews_book_idx").on(table.bookId, table.createdAt),
+]);
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type BookRecord = typeof books.$inferSelect;

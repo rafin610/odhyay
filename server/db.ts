@@ -1,7 +1,7 @@
-import { and, desc, eq, like, or } from "drizzle-orm";
+import { and, avg, count, desc, eq, like, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { createPool } from "mysql2/promise";
-import { authors, bookmarks, books, categories, favorites, InsertUser, readingProgress, users } from "../drizzle/schema.js";
+import { authors, bookReviews, bookmarks, books, categories, favorites, InsertUser, readingProgress, users } from "../drizzle/schema.js";
 import { ENV } from "./_core/env.js";
 
 let connection: ReturnType<typeof drizzle> | null = null;
@@ -213,3 +213,26 @@ export async function getReadingProgress(userId: number, bookId: number) {
 export async function updateReadingProgress(userId: number, bookId: number, currentPage: number, progressPercentage: number) { const db = await requireDb(); await db.insert(readingProgress).values({ userId, bookId, currentPage, progressPercentage }).onDuplicateKeyUpdate({ set: { currentPage, progressPercentage, updatedAt: new Date() } }); }
 export async function toggleFavorite(userId: number, bookId: number) { const db = await requireDb(); const found = await db.select().from(favorites).where(and(eq(favorites.userId, userId), eq(favorites.bookId, bookId))).limit(1); if (found[0]) { await db.delete(favorites).where(eq(favorites.id, found[0].id)); return false; } await db.insert(favorites).values({ userId, bookId }); return true; }
 export async function addBookmark(userId: number, bookId: number, pageNumber: number) { const db = await requireDb(); await db.insert(bookmarks).values({ userId, bookId, pageNumber }).onDuplicateKeyUpdate({ set: { pageNumber } }); }
+
+export async function getBookReviews(bookId: number, userId?: number) {
+  const db = await requireDb();
+  const [summaryRows, reviews, userRows] = await Promise.all([
+    db.select({ averageRating: avg(bookReviews.rating), reviewCount: count(bookReviews.id) }).from(bookReviews).where(eq(bookReviews.bookId, bookId)),
+    db.select({ id: bookReviews.id, rating: bookReviews.rating, review: bookReviews.review, createdAt: bookReviews.createdAt, updatedAt: bookReviews.updatedAt, userName: users.name }).from(bookReviews).innerJoin(users, eq(bookReviews.userId, users.id)).where(eq(bookReviews.bookId, bookId)).orderBy(desc(bookReviews.createdAt)).limit(20),
+    userId ? db.select({ id: bookReviews.id, rating: bookReviews.rating, review: bookReviews.review }).from(bookReviews).where(and(eq(bookReviews.bookId, bookId), eq(bookReviews.userId, userId))).limit(1) : Promise.resolve([]),
+  ]);
+  const summary = summaryRows[0];
+  return { averageRating: summary?.averageRating ? Number(summary.averageRating) : 0, reviewCount: Number(summary?.reviewCount ?? 0), reviews, userReview: userRows[0] ?? null };
+}
+
+export async function upsertBookReview(userId: number, bookId: number, rating: number, review?: string | null) {
+  const db = await requireDb();
+  await db.insert(bookReviews).values({ userId, bookId, rating, review: review?.trim() || null }).onDuplicateKeyUpdate({ set: { rating, review: review?.trim() || null, updatedAt: new Date() } });
+  return getBookReviews(bookId, userId);
+}
+
+export async function deleteBookReview(userId: number, bookId: number) {
+  const db = await requireDb();
+  const result = await db.delete(bookReviews).where(and(eq(bookReviews.userId, userId), eq(bookReviews.bookId, bookId)));
+  return Number(result[0].affectedRows) > 0;
+}

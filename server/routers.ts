@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { getSessionCookieOptions } from "./_core/cookies.js";
 import { systemRouter } from "./_core/systemRouter.js";
 import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc.js";
-import { addBookmark, createBook, deleteBook, getBookBySlug, getReadingProgress, listBooks, listCategories, listManagedUsers, setManagedUserRole, toggleFavorite, updateBook, updateReadingProgress } from "./db.js";
+import { addBookmark, createBook, deleteBook, deleteBookReview, getBookBySlug, getBookReviews, getReadingProgress, listBooks, listCategories, listManagedUsers, setManagedUserRole, toggleFavorite, updateBook, updateReadingProgress, upsertBookReview } from "./db.js";
 
 const bookInput = z.object({
   title: z.string().trim().min(1).max(400),
@@ -33,6 +33,7 @@ export const appRouter = router({
   library: router({
     list: publicProcedure.input(z.object({ query: z.string().trim().max(160).optional(), categorySlug: z.string().trim().max(180).optional() }).optional()).query(async ({ input }) => listBooks(input)),
     getBySlug: publicProcedure.input(z.object({ slug: z.string().min(1).max(460) })).query(async ({ input }) => getBookBySlug(input.slug)),
+    reviews: publicProcedure.input(z.object({ bookId: z.number().int().positive() })).query(async ({ ctx, input }) => getBookReviews(input.bookId, ctx.user?.id)),
     categories: publicProcedure.query(() => listCategories()),
   }),
   reader: router({
@@ -46,6 +47,8 @@ export const appRouter = router({
       await addBookmark(ctx.user.id, input.bookId, input.pageNumber);
       return { success: true } as const;
     }),
+    saveReview: protectedProcedure.input(z.object({ bookId: z.number().int().positive(), rating: z.number().int().min(1).max(5), review: z.string().trim().max(4_000).optional().nullable() })).mutation(async ({ ctx, input }) => upsertBookReview(ctx.user.id, input.bookId, input.rating, input.review)),
+    deleteReview: protectedProcedure.input(z.object({ bookId: z.number().int().positive() })).mutation(async ({ ctx, input }) => ({ success: await deleteBookReview(ctx.user.id, input.bookId) })),
   }),
   admin: router({
     listBooks: adminProcedure.query(() => listBooks({ includeDrafts: true })),
