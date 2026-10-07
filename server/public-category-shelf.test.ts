@@ -16,7 +16,7 @@ describe("public category shelf safeguards", () => {
     ]);
 
     expect(shellSource).toContain("overflow-x-clip");
-    expect(pageSource).toContain("lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]");
+    expect(pageSource).toContain("lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]");
     expect(pageSource).toContain("min-w-0 break-words");
   });
 });
